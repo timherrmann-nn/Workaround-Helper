@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foto-Editor Zuschneiden</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #111827;
+      --accent-2: #f9fafb;
+      --danger: #b91c1c;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 360px 1fr;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(229, 231, 235, 0.7);
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    h1, h2, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 20px;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .value {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    button, .file-label, select {
+      font: inherit;
+    }
+
+    .button, .file-label {
+      appearance: none;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 18px;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      text-align: center;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    .button:hover, .file-label:hover { transform: translateY(-1px); }
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      transform: none;
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .hidden { display: none; }
+
+    .ratio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .ratio-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 18px;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .ratio-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #111827;
+    }
+
+    select {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px 14px;
+      color: var(--text);
+    }
+
+    .hint {
+      background: var(--accent-2);
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .main {
+      display: grid;
+      gap: 24px;
+    }
+
+    .editor-wrap {
+      position: relative;
+      height: 560px;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #111827;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .editor-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center center;
+      will-change: transform;
+      max-width: none;
+      pointer-events: none;
+    }
+
+    .placeholder {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 32px;
+      line-height: 1.6;
+    }
+
+    .crop-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(255,255,255,0.95);
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+      pointer-events: none;
+    }
+
+    .crop-box::before,
+    .crop-box::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .crop-box::before {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.35) 1px, transparent 1px);
+      background-size: 33.333% 100%, 100% 33.333%;
+      opacity: 0.6;
+    }
+
+    .preview-area {
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--border);
+      border-radius: 28px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .preview-area img {
+      max-width: 100%;
+      max-height: 420px;
+      border-radius: 18px;
+      display: block;
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .status.error { color: var(--danger); }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="card panel">
+      <h1>Foto-Editor</h1>
+      <p class="sub">Bilder lokal im Browser hochladen, zuschneiden und z. B. als 1:1 Shop-Bild exportieren.</p>
+
+      <div class="stack">
+        <div class="field">
+          <label class="file-label" for="fileInput">Bild hochladen</label>
+          <input id="fileInput" class="hidden" type="file" accept="image/*">
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <span>Seitenverhältnis</span>
+          </div>
+          <div class="ratio-grid" id="ratioGrid"></div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <span>Zoom</span>
+            <span class="value" id="zoomValue">0</span>
+          </div>
+          <input id="zoomRange" type="range" min="0" max="3" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <span>Rotation</span>
+            <span class="value" id="rotationValue">0°</span>
+          </div>
+          <input id="rotationRange" type="range" min="0" max="360" step="1" value="0">
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <span>Exportformat</span>
+          </div>
+          <select id="formatSelect">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPG</option>
+            <option value="image/webp">WEBP</option>
+          </select>
+        </div>
+
+        <div class="button-grid">
+          <button class="button" id="exportBtn" disabled>Crop erzeugen</button>
+          <button class="button secondary" id="downloadBtn" disabled>Download</button>
+        </div>
+
+        <div class="hint">
+          Für deinen Shop: Social-Media-Bild hochladen, auf <strong>1:1</strong> stellen, Motiv sauber positionieren und als quadratisches Bild exportieren.
+        </div>
+
+        <div id="status" class="status"></div>
+      </div>
+    </section>
+
+    <section class="main">
+      <div class="card panel">
+        <h2>Editor</h2>
+        <div id="editorWrap" class="editor-wrap">
+          <div id="placeholder" class="placeholder">Noch kein Bild geladen.<br>Wähle links eine Datei aus.</div>
+          <img id="editorImage" class="editor-image hidden" alt="Bearbeitungsbild">
+          <div id="cropBox" class="crop-box hidden"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <h2>Vorschau</h2>
+        <div class="preview-area" id="previewArea">
+          <p class="sub">Nach dem Export erscheint hier deine fertige Vorschau.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const ratios = [
+      { label: 'Frei', value: null },
+      { label: '1:1 Shop', value: 1 },
+      { label: '4:5 Social', value: 4 / 5 },
+      { label: '3:4 Portrait', value: 3 / 4 },
+      { label: '16:9 Banner', value: 16 / 9 },
+      { label: '9:16 Story', value: 9 / 16 }
+    ];
+
+    const fileInput = document.getElementById('fileInput');
+    const ratioGrid = document.getElementById('ratioGrid');
+    const zoomRange = document.getElementById('zoomRange');
+    const rotationRange = document.getElementById('rotationRange');
+    const zoomValue = document.getElementById('zoomValue');
+    const rotationValue = document.getElementById('rotationValue');
+    const formatSelect = document.getElementById('formatSelect');
+    const exportBtn = document.getElementById('exportBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusEl = document.getElementById('status');
+    const editorWrap = document.getElementById('editorWrap');
+    const editorImage = document.getElementById('editorImage');
+    const cropBox = document.getElementById('cropBox');
+    const placeholder = document.getElementById('placeholder');
+    const previewArea = document.getElementById('previewArea');
+
+    const state = {
+      image: null,
+      imageUrl: '',
+      fileName: 'bild',
+      aspect: 1,
+      zoom: 0,
+      rotation: 0,
+      x: 0,
+      y: 0,
+      dragStartX: 0,
+      dragStartY: 0,
+      startX: 0,
+      startY: 0,
+      dragging: false,
+      outputUrl: '',
+      baseScale: 1,
+      minZoom: 0,
+      maxZoom: 3
+    };
+
+    function setStatus(message = '', isError = false) {
+      statusEl.textContent = message;
+      statusEl.classList.toggle('error', isError);
+    }
+
+    function renderRatioButtons() {
+      ratioGrid.innerHTML = '';
+      ratios.forEach((ratio) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ratio-btn' + ((state.aspect === ratio.value || (state.aspect === null && ratio.value === null)) ? ' active' : '');
+        btn.textContent = ratio.label;
+        btn.addEventListener('click', () => {
+          state.aspect = ratio.value;
+          renderRatioButtons();
+          updateCropBox();
+          clampPosition();
+          updateImageTransform();
+        });
+        ratioGrid.appendChild(btn);
+      });
+    }
+
+    function updateCropBox() {
+      const wrapW = editorWrap.clientWidth;
+      const wrapH = editorWrap.clientHeight;
+      const maxW = wrapW * 0.72;
+      const maxH = wrapH * 0.72;
+      let boxW, boxH;
+
+      if (state.aspect === null) {
+        boxW = maxW;
+        boxH = maxH;
+      } else {
+        const ratio = state.aspect;
+        boxW = maxW;
+        boxH = boxW / ratio;
+        if (boxH > maxH) {
+          boxH = maxH;
+          boxW = boxH * ratio;
+        }
+      }
+
+      cropBox.style.width = boxW + 'px';
+      cropBox.style.height = boxH + 'px';
+    }
+
+    function calculateBaseScale() {
+      if (!state.image) return;
+      const boxW = cropBox.clientWidth;
+      const boxH = cropBox.clientHeight;
+      const fitScale = Math.max(
+        boxW / state.image.naturalWidth,
+        boxH / state.image.naturalHeight
+      );
+      state.baseScale = fitScale;
+    }
+
+    function getCurrentScale() {
+      return state.baseScale * (1 + state.zoom);
+    }
+
+    function updateZoomLabel() {
+      zoomValue.textContent = state.zoom.toFixed(2);
+    }
+
+    function updateImageTransform() {
+      const scale = getCurrentScale();
+      editorImage.style.transform = `translate(calc(-50% + ${state.x}px), calc(-50% + ${state.y}px)) scale(${scale}) rotate(${state.rotation}deg)`;
+    }px), calc(-50% + ${state.y}px)) scale(${state.zoom}) rotate(${state.rotation}deg)`;
+    }
+
+    function getRotatedBounds(width, height, angleDeg, scale) {
+      const angle = angleDeg * Math.PI / 180;
+      const sin = Math.abs(Math.sin(angle));
+      const cos = Math.abs(Math.cos(angle));
+      return {
+        width: (width * cos + height * sin) * scale,
+        height: (width * sin + height * cos) * scale
+      };
+    }
+
+    function clampPosition() {
+      if (!state.image) return;
+      const boxW = cropBox.clientWidth;
+      const boxH = cropBox.clientHeight;
+      const scale = getCurrentScale();
+      const bounds = getRotatedBounds(state.image.naturalWidth, state.image.naturalHeight, state.rotation, scale);
+      const maxX = Math.max(0, (bounds.width - boxW) / 2);
+      const maxY = Math.max(0, (bounds.height - boxH) / 2);
+      state.x = Math.min(maxX, Math.max(-maxX, state.x));
+      state.y = Math.min(maxY, Math.max(-maxY, state.y));
+    }
+
+    function resetEditor() {
+      state.zoom = 0;
+      state.rotation = 0;
+      state.x = 0;
+      state.y = 0;
+      zoomRange.min = String(state.minZoom);
+      zoomRange.max = String(state.maxZoom);
+      zoomRange.value = '0';
+      rotationRange.value = '0';
+      updateZoomLabel();
+      rotationValue.textContent = '0°';
+      renderRatioButtons();
+      updateCropBox();
+      calculateBaseScale();
+      clampPosition();
+      updateImageTransform();
+    }
+
+    function clearOutputUrl() {
+      if (state.outputUrl) {
+        URL.revokeObjectURL(state.outputUrl);
+        state.outputUrl = '';
+      }
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      clearOutputUrl();
+      setStatus('');
+      state.fileName = file.name.replace(/\.[^.]+$/, '') || 'bild';
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          state.image = img;
+          state.imageUrl = reader.result;
+          editorImage.src = state.imageUrl;
+          placeholder.classList.add('hidden');
+          editorImage.classList.remove('hidden');
+          cropBox.classList.remove('hidden');
+          exportBtn.disabled = false;
+          downloadBtn.disabled = true;
+          previewArea.innerHTML = '<p class="sub">Nach dem Export erscheint hier deine fertige Vorschau.</p>';
+          resetEditor();
+        };
+        img.onerror = () => setStatus('Bild konnte nicht geladen werden.', true);
+        img.src = reader.result;
+      };
+      reader.onerror = () => setStatus('Datei konnte nicht gelesen werden.', true);
+      reader.readAsDataURL(file);
+    });
+
+    zoomRange.addEventListener('input', () => {
+      state.zoom = Number(zoomRange.value);
+      updateZoomLabel();
+      clampPosition();
+      updateImageTransform();
+    });
+
+    rotationRange.addEventListener('input', () => {
+      state.rotation = Number(rotationRange.value);
+      rotationValue.textContent = state.rotation + '°';
+      clampPosition();
+      updateImageTransform();
+    });
+
+    function startDrag(clientX, clientY) {
+      if (!state.image) return;
+      state.dragging = true;
+      state.dragStartX = clientX;
+      state.dragStartY = clientY;
+      state.startX = state.x;
+      state.startY = state.y;
+      editorWrap.style.cursor = 'grabbing';
+    }
+
+    function moveDrag(clientX, clientY) {
+      if (!state.dragging) return;
+      const deltaX = clientX - state.dragStartX;
+      const deltaY = clientY - state.dragStartY;
+      state.x = state.startX + deltaX;
+      state.y = state.startY + deltaY;
+      clampPosition();
+      updateImageTransform();
+    }
+
+    function endDrag() {
+      state.dragging = false;
+      editorWrap.style.cursor = 'grab';
+    }
+
+    editorWrap.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+    window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+    window.addEventListener('mouseup', endDrag);
+
+    editorWrap.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      startDrag(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      moveDrag(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchend', endDrag);
+    window.addEventListener('resize', () => {
+      updateCropBox();
+      calculateBaseScale();
+      clampPosition();
+      updateImageTransform();
+    });
+
+    exportBtn.addEventListener('click', () => {
+      if (!state.image) return;
+
+      setStatus('Export wird erzeugt ...');
+      clearOutputUrl();
+
+      const wrapRect = editorWrap.getBoundingClientRect();
+      const cropRect = cropBox.getBoundingClientRect();
+      const cropW = Math.round(cropRect.width);
+      const cropH = Math.round(cropRect.height);
+
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) {
+        setStatus('Canvas konnte nicht erstellt werden.', true);
+        return;
+      }
+
+      const angle = state.rotation * Math.PI / 180;
+      const sin = Math.abs(Math.sin(angle));
+      const cos = Math.abs(Math.cos(angle));
+      const rotatedW = Math.ceil(state.image.naturalWidth * cos + state.image.naturalHeight * sin);
+      const rotatedH = Math.ceil(state.image.naturalWidth * sin + state.image.naturalHeight * cos);
+
+      tempCanvas.width = rotatedW;
+      tempCanvas.height = rotatedH;
+
+      tempCtx.translate(rotatedW / 2, rotatedH / 2);
+      tempCtx.rotate(angle);
+      tempCtx.scale(getCurrentScale(), getCurrentScale());
+      tempCtx.drawImage(state.image, -state.image.naturalWidth / 2, -state.image.naturalHeight / 2);
+      tempCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+      const bounds = getRotatedBounds(state.image.naturalWidth, state.image.naturalHeight, state.rotation, getCurrentScale());
+      const imageLeft = wrapRect.left + wrapRect.width / 2 - bounds.width / 2 + state.x;
+      const imageTop = wrapRect.top + wrapRect.height / 2 - bounds.height / 2 + state.y;
+      const sourceX = ((cropRect.left - imageLeft) / bounds.width) * tempCanvas.width;
+      const sourceY = ((cropRect.top - imageTop) / bounds.height) * tempCanvas.height;
+      const sourceW = (cropRect.width / bounds.width) * tempCanvas.width;
+      const sourceH = (cropRect.height / bounds.height) * tempCanvas.height;
+
+      const outputCanvas = document.createElement('canvas');
+      const outputCtx = outputCanvas.getContext('2d');
+      if (!outputCtx) {
+        setStatus('Export-Canvas konnte nicht erstellt werden.', true);
+        return;
+      }
+
+      outputCanvas.width = cropW;
+      outputCanvas.height = cropH;
+      outputCtx.drawImage(tempCanvas, sourceX, sourceY, sourceW, sourceH, 0, 0, cropW, cropH);
+
+      const format = formatSelect.value;
+      const quality = format === 'image/png' ? undefined : 0.95;
+      outputCanvas.toBlob((blob) => {
+        if (!blob) {
+          setStatus('Export fehlgeschlagen.', true);
+          return;
+        }
+
+        state.outputUrl = URL.createObjectURL(blob);
+        const img = document.createElement('img');
+        img.src = state.outputUrl;
+        img.alt = 'Exportierte Vorschau';
+        previewArea.innerHTML = '';
+        previewArea.appendChild(img);
+        downloadBtn.disabled = false;
+        setStatus('Crop erfolgreich erzeugt.');
+      }, format, quality);
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!state.outputUrl) return;
+      const ext = formatSelect.value === 'image/jpeg' ? 'jpg' : formatSelect.value === 'image/webp' ? 'webp' : 'png';
+      const link = document.createElement('a');
+      link.href = state.outputUrl;
+      link.download = `${state.fileName}-${state.aspect === 1 ? '1x1' : 'crop'}.${ext}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    renderRatioButtons();
+    updateCropBox();
+  </script>
+</body>
+</html>
