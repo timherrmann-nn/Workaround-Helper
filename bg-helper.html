@@ -1,1 +1,788 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BG Color Helper</title>
+  <style>
+    :root{
+      --radius:14px;
+      --border:rgba(0,0,0,.10);
+      --bg:#f6f6f6;
+      --card:#fff;
+      --text:#111;
+      --muted:rgba(0,0,0,.65);
+      --ok:#12a150;
+      --bad:#d32f2f;
+    }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:980px;
+      margin:24px auto;
+      padding:0 14px 30px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media (min-width: 900px){
+      .grid{ grid-template-columns: 1.1fr .9fr; }
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+    }
+    h1{
+      font-size:16px;
+      margin:0 0 10px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+    label{
+      font-size:12px;
+      font-weight:800;
+      display:block;
+      margin:10px 0 6px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    input[type="text"]{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      font-size:14px;
+      outline:none;
+    }
+    input[type="color"]{
+      width:44px;
+      height:40px;
+      border:none;
+      padding:0;
+      background:transparent;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin:8px 0 0;
+      line-height:1.35;
+    }
 
+    .swatches{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    @media (min-width: 520px){
+      .swatches{ grid-template-columns: 1fr 1fr; }
+    }
+    .swatch{
+      border:1px solid var(--border);
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .swatch__top{
+      position:relative;
+      padding:12px;
+      min-height:76px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      gap:6px;
+    }
+    .swatch__meta{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+      font-size:12px;
+      font-weight:900;
+    }
+    .swatch__code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:12px;
+      opacity:.95;
+      user-select:all;
+    }
+    .pill{
+      font-size:11px;
+      font-weight:900;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.10);
+      backdrop-filter: blur(6px);
+    }
+    .swatch__bottom{
+      padding:10px 12px;
+      display:flex;
+      gap:8px;
+      justify-content:space-between;
+      align-items:center;
+      border-top:1px solid var(--border);
+      background:#fff;
+    }
+    .small{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.2;
+    }
+
+    .preview{
+      border:1px solid var(--border);
+      border-radius:16px;
+      overflow:hidden;
+    }
+    .preview__hero{
+      padding:18px;
+      min-height:160px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .preview__top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .logo{
+      font-weight:1000;
+      letter-spacing:.06em;
+      font-size:12px;
+      opacity:.9;
+    }
+    .cta{
+      margin-top:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:1000;
+      font-size:12px;
+      border:1px solid rgba(0,0,0,.14);
+      background:rgba(255,255,255,.85);
+      color:#111;
+      width:max-content;
+    }
+    .preview__text{
+      font-size:22px;
+      font-weight:1000;
+      line-height:1.1;
+      letter-spacing:.01em;
+    }
+    .preview__sub{
+      font-size:12px;
+      opacity:.85;
+      max-width:45ch;
+      line-height:1.35;
+    }
+    .preview__footer{
+      padding:10px 14px;
+      background:#fff;
+      border-top:1px solid var(--border);
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%);
+      background:#111;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:12px;
+      opacity:0;
+      pointer-events:none;
+      transition:.2s;
+    }
+    .toast.show{ opacity:1; }
+
+    /* Accessibility box */
+    .a11y{
+      margin-top:10px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+      background:#fff;
+    }
+    .a11y__title{
+      font-size:12px;
+      font-weight:1000;
+      margin:0 0 6px;
+    }
+    .a11y__grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    @media (min-width:520px){
+      .a11y__grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .a11y__block{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:8px 10px;
+      background:#fafafa;
+    }
+    .a11y__label{
+      font-size:12px;
+      font-weight:1000;
+      margin:0 0 6px;
+    }
+    .a11y__line{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:12px;
+      line-height:1.4;
+    }
+    .badge{
+      font-weight:1000;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      white-space:nowrap;
+    }
+    .badge.ok{ color:var(--ok); }
+    .badge.bad{ color:var(--bad); }
+
+    /* Small helper layout for two inputs in one row */
+    .grow{ flex:1 1 180px; min-width:180px; }
+    .fixed{ flex:0 0 auto; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="grid">
+      <!-- LEFT: Generator -->
+      <div class="card">
+        <h1>Background-Color Finder (für deine Produktfarbe)</h1>
+
+        <label>Input Farbe (Hex)</label>
+        <div class="row">
+          <input id="hex" class="grow" type="text" value="#51533B" placeholder="#RRGGBB" />
+          <input id="picker" class="fixed" type="color" value="#51533B" />
+          <button class="btn fixed" id="usePreset">Presets</button>
+        </div>
+
+        <div class="hint">
+          Gibt dir passende Backgrounds: <b>helle Fläche</b>, <b>dunkle Fläche</b>, plus eine <b>neutrale</b> Option.
+          Dazu siehst du Kontraste und kannst Werte kopieren.
+        </div>
+
+        <div class="swatches" id="swatches"></div>
+      </div>
+
+      <!-- RIGHT: Preview -->
+      <div class="card">
+        <h1>Live Preview</h1>
+
+        <label>Preview Input Farbe (Hex)</label>
+        <div class="row">
+          <select id="inputMode" class="btn fixed" style="width:190px">
+            <option value="linked" selected>Linked (links)</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input id="previewHex" class="grow" type="text" value="#51533B" placeholder="#RRGGBB" />
+          <input id="previewPicker" class="fixed" type="color" value="#51533B" />
+        </div>
+        <div class="hint" id="inputHint">Aktuell nutzt die Preview die linke Input-Farbe.</div>
+
+        <label>Preview Background</label>
+        <div class="row">
+          <select id="bgSelect" class="btn" style="flex:1">
+            <option value="auto">Auto (beste Lesbarkeit)</option>
+          </select>
+          <button class="btn" id="copyCSS">Copy CSS</button>
+        </div>
+
+        <label>Textfarbe</label>
+        <div class="row">
+          <select id="textMode" class="btn fixed" style="width:190px">
+            <option value="auto" selected>Auto Text</option>
+            <option value="custom">Custom Text</option>
+          </select>
+          <input id="textHex" class="grow" type="text" value="#111111" placeholder="#RRGGBB" />
+          <input id="textPicker" class="fixed" type="color" value="#111111" />
+        </div>
+
+        <div class="hint" id="bestHint"></div>
+
+        <div class="a11y" aria-live="polite">
+          <div class="a11y__title">Barrierefreiheit (WCAG Kontrast)</div>
+          <div class="a11y__grid">
+            <div class="a11y__block">
+              <div class="a11y__label">Großer Text</div>
+              <div class="a11y__line"><span>AA:</span> <span id="lgAA" class="badge">—</span></div>
+              <div class="a11y__line"><span>AAA:</span> <span id="lgAAA" class="badge">—</span></div>
+            </div>
+            <div class="a11y__block">
+              <div class="a11y__label">Kleiner Text</div>
+              <div class="a11y__line"><span>AA:</span> <span id="smAA" class="badge">—</span></div>
+              <div class="a11y__line"><span>AAA:</span> <span id="smAAA" class="badge">—</span></div>
+            </div>
+          </div>
+          <div class="hint" id="ratioHint" style="margin-top:8px">—</div>
+        </div>
+
+        <div class="preview" style="margin-top:12px">
+          <div class="preview__hero" id="hero">
+            <div class="preview__top">
+              <div class="logo">NAUGHTY NUTS</div>
+              <div class="pill" id="contrastPill">Kontrast —</div>
+            </div>
+
+            <div>
+              <div class="preview__text" id="headline">Surprising with nuts.</div>
+              <div class="preview__sub" id="subline">
+                Kurze, cleane Zutatenliste – ohne Schnickschnack. Passt zu deinem Anspruch.
+              </div>
+              <div class="cta" id="cta">In den Warenkorb</div>
+            </div>
+          </div>
+
+          <div class="preview__footer">
+            <span id="footerMode">Textfarbe: Auto</span>
+            <span id="textInfo" class="small">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Kopiert</div>
+
+<script>
+(() => {
+  const hexEl = document.getElementById('hex');
+  const picker = document.getElementById('picker');
+  const swatchesEl = document.getElementById('swatches');
+
+  const inputMode = document.getElementById('inputMode');
+  const previewHex = document.getElementById('previewHex');
+  const previewPicker = document.getElementById('previewPicker');
+  const inputHint = document.getElementById('inputHint');
+
+  const bgSelect = document.getElementById('bgSelect');
+  const hero = document.getElementById('hero');
+  const copyCSSBtn = document.getElementById('copyCSS');
+  const toast = document.getElementById('toast');
+  const contrastPill = document.getElementById('contrastPill');
+  const textInfo = document.getElementById('textInfo');
+  const bestHint = document.getElementById('bestHint');
+
+  const textMode = document.getElementById('textMode');
+  const textHex = document.getElementById('textHex');
+  const textPicker = document.getElementById('textPicker');
+  const footerMode = document.getElementById('footerMode');
+
+  const lgAA  = document.getElementById('lgAA');
+  const lgAAA = document.getElementById('lgAAA');
+  const smAA  = document.getElementById('smAA');
+  const smAAA = document.getElementById('smAAA');
+  const ratioHint = document.getElementById('ratioHint');
+
+  const presets = [
+    { name: 'Brand BG', hex: '#51533B' },
+    { name: 'Produkt dunkel', hex: '#5C5C31' },
+    { name: 'Produkt hell', hex: '#C4C42B' },
+  ];
+
+  const normalizeHex = (h) => {
+    if (!h) return null;
+    h = String(h).trim();
+    if (!h.startsWith('#')) h = '#'+h;
+    if (/^#([0-9a-f]{3})$/i.test(h)) {
+      const m = h.slice(1);
+      h = '#'+m.split('').map(c=>c+c).join('');
+    }
+    if (!/^#([0-9a-f]{6})$/i.test(h)) return null;
+    return h.toUpperCase();
+  };
+
+  const hexToRgb = (hex) => {
+    const h = hex.replace('#','');
+    return {
+      r: parseInt(h.slice(0,2),16),
+      g: parseInt(h.slice(2,4),16),
+      b: parseInt(h.slice(4,6),16),
+    };
+  };
+
+  const srgbToLin = (c) => {
+    c /= 255;
+    return c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+  };
+
+  const luminance = (hex) => {
+    const {r,g,b} = hexToRgb(hex);
+    const R = srgbToLin(r), G = srgbToLin(g), B = srgbToLin(b);
+    return 0.2126*R + 0.7152*G + 0.0722*B;
+  };
+
+  const contrastRatio = (hex1, hex2) => {
+    const L1 = luminance(hex1);
+    const L2 = luminance(hex2);
+    const lighter = Math.max(L1,L2);
+    const darker  = Math.min(L1,L2);
+    return (lighter + 0.05) / (darker + 0.05);
+  };
+
+  const mix = (hexA, hexB, t) => {
+    const a = hexToRgb(hexA), b = hexToRgb(hexB);
+    const r = Math.round(a.r*(1-t) + b.r*t);
+    const g = Math.round(a.g*(1-t) + b.g*t);
+    const b2= Math.round(a.b*(1-t) + b.b*t);
+    const toHex = (n)=>n.toString(16).padStart(2,'0');
+    return ('#'+toHex(r)+toHex(g)+toHex(b2)).toUpperCase();
+  };
+
+  const pickBestText = (bgHex) => {
+    const white = '#FFFFFF', black = '#111111';
+    const cW = contrastRatio(bgHex, white);
+    const cB = contrastRatio(bgHex, black);
+    return cW >= cB ? { text:white, contrast:cW } : { text:black, contrast:cB };
+  };
+
+  const formatCR = (n) => (Math.round(n*100)/100).toFixed(2);
+
+  const suggestBackgrounds = (inputHex) => {
+    const light = mix(inputHex, '#FFFFFF', 0.86);
+    const dark  = mix(inputHex, '#0F0F0F', 0.70);
+    const neutral = mix(mix(inputHex, '#F7F6F6', 0.85), '#FFFFFF', 0.15);
+    const soft = mix(inputHex, '#FFFFFF', 0.92);
+
+    const seen = new Set();
+    const arr = [light, neutral, soft, dark].filter(h => {
+      if (seen.has(h)) return false;
+      seen.add(h); return true;
+    });
+
+    return arr.map((bg) => {
+      const { text, contrast } = pickBestText(bg);
+      return { bg, autoText: text, autoContrast: contrast };
+    });
+  };
+
+  const showToast = (msg='Kopiert') => {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 900);
+  };
+
+  const copy = async (txt) => {
+    try{
+      await navigator.clipboard.writeText(txt);
+      showToast('Kopiert');
+    }catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Kopiert');
+    }
+  };
+
+  const setBadge = (el, pass) => {
+    el.textContent = pass ? 'Pass' : 'Fail';
+    el.classList.remove('ok','bad');
+    el.classList.add(pass ? 'ok' : 'bad');
+  };
+
+  const updateA11y = (bg, text, cr) => {
+    setBadge(lgAA,  cr >= 3.0);
+    setBadge(lgAAA, cr >= 4.5);
+    setBadge(smAA,  cr >= 4.5);
+    setBadge(smAAA, cr >= 7.0);
+    ratioHint.textContent = `Kontrastverhältnis: ${formatCR(cr)} (Text ${text} auf BG ${bg})`;
+  };
+
+  // ===== Source for suggestions: LEFT input OR RIGHT custom input =====
+  const getPreviewInputHex = () => {
+    if (inputMode.value === 'linked') {
+      return normalizeHex(hexEl.value) || '#51533B';
+    }
+    return normalizeHex(previewHex.value) || '#51533B';
+  };
+
+  const syncPreviewInputUI = () => {
+    const linked = inputMode.value === 'linked';
+
+    if (linked) {
+      const n = normalizeHex(hexEl.value) || '#51533B';
+      previewHex.value = n;
+      previewPicker.value = n;
+      previewHex.disabled = true;
+      previewPicker.disabled = true;
+      previewHex.style.opacity = '.55';
+      previewPicker.style.opacity = '.55';
+      inputHint.textContent = 'Aktuell nutzt die Preview die linke Input-Farbe.';
+    } else {
+      const n = normalizeHex(previewHex.value) || normalizeHex(hexEl.value) || '#51533B';
+      previewHex.value = n;
+      previewPicker.value = n;
+      previewHex.disabled = false;
+      previewPicker.disabled = false;
+      previewHex.style.opacity = '1';
+      previewPicker.style.opacity = '1';
+      inputHint.textContent = 'Preview nutzt eine eigene Input-Farbe (Custom).';
+    }
+  };
+
+  const currentBgFromUI = (suggestions) => {
+    if (bgSelect.value === 'auto') {
+      const best = [...suggestions].sort((a,b)=>b.autoContrast-a.autoContrast)[0];
+      return best.bg;
+    }
+    return bgSelect.value;
+  };
+
+  const currentTextFromUI = (bg) => {
+    if (textMode.value === 'auto') return pickBestText(bg).text;
+    return normalizeHex(textHex.value) || '#111111';
+  };
+
+  const applyPreview = () => {
+    const input = getPreviewInputHex();
+    const suggestions = suggestBackgrounds(input);
+
+    // rebuild dropdown options each time to match current preview input
+    const prevValue = bgSelect.value;
+    bgSelect.innerHTML = `<option value="auto">Auto (beste Lesbarkeit)</option>`;
+    suggestions.forEach((s, idx) => {
+      const label = idx === 0 ? 'Hell' : idx === suggestions.length-1 ? 'Dunkel' : 'Neutral';
+      const opt = document.createElement('option');
+      opt.value = s.bg;
+      opt.textContent = `${label}: ${s.bg}`;
+      bgSelect.appendChild(opt);
+    });
+    // try restore selection if still exists
+    if ([...bgSelect.options].some(o => o.value === prevValue)) bgSelect.value = prevValue;
+    else bgSelect.value = 'auto';
+
+    const bestBg = [...suggestions].sort((a,b)=>b.autoContrast-a.autoContrast)[0];
+    bestHint.innerHTML = `Best Guess (Auto): <b>${bestBg.bg}</b> mit Auto-Text <b>${bestBg.autoText}</b> (Kontrast ${formatCR(bestBg.autoContrast)})`;
+
+    const bg = currentBgFromUI(suggestions);
+    const text = currentTextFromUI(bg);
+    const cr = contrastRatio(bg, text);
+
+    hero.style.background = bg;
+    hero.style.color = text;
+
+    const cta = document.getElementById('cta');
+    const ctaText = (text === '#FFFFFF') ? '#111111' : '#FFFFFF';
+    const ctaBg   = (text === '#FFFFFF') ? 'rgba(255,255,255,.88)' : 'rgba(17,17,17,.88)';
+    cta.style.background = ctaBg;
+    cta.style.color = ctaText;
+
+    contrastPill.textContent = `Kontrast ${formatCR(cr)}`;
+    contrastPill.style.background = (text === '#FFFFFF') ? 'rgba(0,0,0,.22)' : 'rgba(255,255,255,.72)';
+    contrastPill.style.color = text;
+
+    footerMode.textContent = `Textfarbe: ${textMode.value === 'auto' ? 'Auto' : 'Custom'}`;
+    textInfo.textContent = `Input ${input} • BG ${bg} • Text ${text}`;
+
+    updateA11y(bg, text, cr);
+
+    const isCustomText = textMode.value === 'custom';
+    textHex.disabled = !isCustomText;
+    textPicker.disabled = !isCustomText;
+    textHex.style.opacity = isCustomText ? '1' : '.55';
+    textPicker.style.opacity = isCustomText ? '1' : '.55';
+  };
+
+  // LEFT swatches generator (stays based on LEFT input)
+  const renderSwatches = (inputHex) => {
+    const suggestions = suggestBackgrounds(inputHex);
+    swatchesEl.innerHTML = '';
+
+    suggestions.forEach((s, idx) => {
+      const label = idx === 0 ? 'Hell' : idx === suggestions.length-1 ? 'Dunkel' : 'Neutral';
+
+      const sw = document.createElement('div');
+      sw.className = 'swatch';
+      sw.innerHTML = `
+        <div class="swatch__top" style="background:${s.bg}; color:${s.autoText}">
+          <div class="swatch__meta">
+            <span class="pill">${label}</span>
+            <span class="swatch__code">${s.bg}</span>
+          </div>
+          <div style="font-weight:1000; font-size:13px; line-height:1.15;">Preview Text</div>
+          <div style="font-size:11px; opacity:.9; line-height:1.25;">
+            Auto-Kontrast: ${formatCR(s.autoContrast)} — Auto-Text: ${s.autoText}
+          </div>
+        </div>
+        <div class="swatch__bottom">
+          <div class="small">BG: ${s.bg}<br>Auto Text: ${s.autoText}</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" data-copy="${s.bg}">Copy BG</button>
+            <button class="btn" data-use-bg="${s.bg}">Use (Preview BG)</button>
+          </div>
+        </div>
+      `;
+      swatchesEl.appendChild(sw);
+    });
+  };
+
+  const updateLeft = () => {
+    const n = normalizeHex(hexEl.value);
+    if (!n) return;
+    hexEl.value = n;
+    picker.value = n;
+    renderSwatches(n);
+
+    // keep preview linked if needed
+    syncPreviewInputUI();
+    applyPreview();
+  };
+
+  // ===== Events =====
+  hexEl.addEventListener('input', () => {
+    const n = normalizeHex(hexEl.value);
+    if (n) { picker.value = n; renderSwatches(n); syncPreviewInputUI(); applyPreview(); }
+  });
+
+  picker.addEventListener('input', () => {
+    hexEl.value = picker.value.toUpperCase();
+    updateLeft();
+  });
+
+  document.getElementById('usePreset').addEventListener('click', () => {
+    const current = normalizeHex(hexEl.value) || '#51533B';
+    const idx = presets.findIndex(p => p.hex.toUpperCase() === current);
+    const next = presets[(idx + 1) % presets.length];
+    hexEl.value = next.hex;
+    picker.value = next.hex;
+    showToast(`Preset: ${next.name}`);
+    updateLeft();
+  });
+
+  // Swatches actions: copy / use BG
+  swatchesEl.addEventListener('click', (e) => {
+    const copyBtn = e.target.closest('[data-copy]');
+    if (copyBtn) return copy(copyBtn.getAttribute('data-copy'));
+
+    const useBtn = e.target.closest('[data-use-bg]');
+    if (useBtn) {
+      const bg = useBtn.getAttribute('data-use-bg');
+      bgSelect.value = bg;
+      applyPreview();
+      showToast('Preview BG gesetzt');
+    }
+  });
+
+  // Preview input mode
+  inputMode.addEventListener('change', () => {
+    syncPreviewInputUI();
+    applyPreview();
+  });
+
+  previewHex.addEventListener('input', () => {
+    if (inputMode.value !== 'custom') return;
+    const n = normalizeHex(previewHex.value);
+    if (n) {
+      previewHex.value = n;
+      previewPicker.value = n;
+      applyPreview();
+    }
+  });
+
+  previewPicker.addEventListener('input', () => {
+    if (inputMode.value !== 'custom') return;
+    const n = normalizeHex(previewPicker.value);
+    if (n) {
+      previewHex.value = n;
+      applyPreview();
+    }
+  });
+
+  bgSelect.addEventListener('change', applyPreview);
+
+  // Text controls
+  textMode.addEventListener('change', applyPreview);
+
+  textHex.addEventListener('input', () => {
+    const n = normalizeHex(textHex.value);
+    if (n) {
+      textHex.value = n;
+      textPicker.value = n;
+      applyPreview();
+    }
+  });
+
+  textPicker.addEventListener('input', () => {
+    const n = normalizeHex(textPicker.value);
+    if (n) {
+      textHex.value = n;
+      applyPreview();
+    }
+  });
+
+  // Copy CSS
+  copyCSSBtn.addEventListener('click', () => {
+    const input = getPreviewInputHex();
+    const suggestions = suggestBackgrounds(input);
+    const bg = currentBgFromUI(suggestions);
+    const text = currentTextFromUI(bg);
+    const txt = `background: ${bg};\ncolor: ${text};`;
+    copy(txt);
+  });
+
+  // Init
+  const nT = normalizeHex(textHex.value) || '#111111';
+  textHex.value = nT;
+  textPicker.value = nT;
+
+  // init preview input values
+  const initLeft = normalizeHex(hexEl.value) || '#51533B';
+  hexEl.value = initLeft;
+  picker.value = initLeft;
+
+  previewHex.value = initLeft;
+  previewPicker.value = initLeft;
+
+  syncPreviewInputUI();
+  renderSwatches(initLeft);
+  applyPreview();
+})();
+</script>
+</body>
+</html>
