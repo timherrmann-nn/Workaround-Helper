@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Foto-Editor Zuschneiden</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f4f6f8;
@@ -15,7 +12,6 @@
       --muted: #6b7280;
       --border: #e5e7eb;
       --accent: #111827;
-      --accent-2: #f9fafb;
       --danger: #b91c1c;
       --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
       --radius: 24px;
@@ -46,25 +42,11 @@
       border: 1px solid rgba(229, 231, 235, 0.7);
     }
 
-    .panel {
-      padding: 24px;
-    }
+    .panel { padding: 24px; }
 
-    h1, h2, p {
-      margin: 0;
-    }
-
-    h1 {
-      font-size: 28px;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-
-    h2 {
-      font-size: 20px;
-      line-height: 1.25;
-      margin-bottom: 16px;
-    }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: 28px; line-height: 1.2; margin-bottom: 8px; }
+    h2 { font-size: 20px; line-height: 1.25; margin-bottom: 16px; }
 
     .sub {
       color: var(--muted);
@@ -99,9 +81,7 @@
       font-weight: 500;
     }
 
-    button, .file-label, select {
-      font: inherit;
-    }
+    button, .file-label, select { font: inherit; }
 
     .button, .file-label {
       appearance: none;
@@ -114,9 +94,12 @@
       font-weight: 600;
       text-align: center;
       transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+      text-decoration: none;
+      display: inline-block;
     }
 
     .button:hover, .file-label:hover { transform: translateY(-1px); }
+
     .button:disabled {
       cursor: not-allowed;
       opacity: 0.5;
@@ -135,7 +118,7 @@
       gap: 12px;
     }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
 
     .ratio-grid {
       display: grid;
@@ -151,6 +134,7 @@
       padding: 12px;
       cursor: pointer;
       font-weight: 600;
+      transition: 0.15s ease;
     }
 
     .ratio-btn.active {
@@ -173,7 +157,7 @@
     }
 
     .hint {
-      background: var(--accent-2);
+      background: #f9fafb;
       border-radius: 18px;
       padding: 14px 16px;
       color: var(--muted);
@@ -194,6 +178,7 @@
       background: #111827;
       user-select: none;
       touch-action: none;
+      cursor: grab;
     }
 
     .editor-image {
@@ -201,9 +186,10 @@
       top: 50%;
       left: 50%;
       transform-origin: center center;
-      will-change: transform;
       max-width: none;
       pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .placeholder {
@@ -226,20 +212,14 @@
       pointer-events: none;
     }
 
-    .crop-box::before,
-    .crop-box::after {
+    .crop-box::before {
       content: "";
       position: absolute;
       inset: 0;
-      pointer-events: none;
-    }
-
-    .crop-box::before {
       background-image:
-        linear-gradient(to right, rgba(255,255,255,0.35) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.35) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255,255,255,0.3) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.3) 1px, transparent 1px);
       background-size: 33.333% 100%, 100% 33.333%;
-      opacity: 0.6;
     }
 
     .preview-area {
@@ -269,9 +249,7 @@
     .status.error { color: var(--danger); }
 
     @media (max-width: 980px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
+      .app { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -279,7 +257,7 @@
   <div class="app">
     <section class="card panel">
       <h1>Foto-Editor</h1>
-      <p class="sub">Bilder lokal im Browser hochladen, zuschneiden und z. B. als 1:1 Shop-Bild exportieren.</p>
+      <p class="sub">Bilder lokal im Browser hochladen, frei positionieren und z. B. als 1:1 Shop-Bild exportieren.</p>
 
       <div class="stack">
         <div class="field">
@@ -288,16 +266,14 @@
         </div>
 
         <div class="field">
-          <div class="label-row">
-            <span>Seitenverhältnis</span>
-          </div>
+          <div class="label-row"><span>Seitenverhältnis</span></div>
           <div class="ratio-grid" id="ratioGrid"></div>
         </div>
 
         <div class="field">
           <div class="label-row">
             <span>Zoom</span>
-            <span class="value" id="zoomValue">0</span>
+            <span class="value" id="zoomValue">0.00</span>
           </div>
           <input id="zoomRange" type="range" min="0" max="3" step="0.01" value="0">
         </div>
@@ -311,9 +287,7 @@
         </div>
 
         <div class="field">
-          <div class="label-row">
-            <span>Exportformat</span>
-          </div>
+          <div class="label-row"><span>Exportformat</span></div>
           <select id="formatSelect">
             <option value="image/png">PNG</option>
             <option value="image/jpeg">JPG</option>
@@ -327,7 +301,7 @@
         </div>
 
         <div class="hint">
-          Für deinen Shop: Social-Media-Bild hochladen, auf <strong>1:1</strong> stellen, Motiv sauber positionieren und als quadratisches Bild exportieren.
+          Zoom <strong>0</strong> ist jetzt der kleinste sinnvolle Startwert. Das Bild wird beim Laden automatisch so eingepasst, dass der Crop-Rahmen direkt voll nutzbar ist.
         </div>
 
         <div id="status" class="status"></div>
@@ -354,185 +328,177 @@
   </div>
 
   <script>
-    const ratios = [
-      { label: 'Frei', value: null },
-      { label: '1:1 Shop', value: 1 },
-      { label: '4:5 Social', value: 4 / 5 },
-      { label: '3:4 Portrait', value: 3 / 4 },
-      { label: '16:9 Banner', value: 16 / 9 },
-      { label: '9:16 Story', value: 9 / 16 }
-    ];
+    (() => {
+      const ratios = [
+        { label: 'Frei', value: null },
+        { label: '1:1 Shop', value: 1 },
+        { label: '4:5 Social', value: 4 / 5 },
+        { label: '3:4 Portrait', value: 3 / 4 },
+        { label: '16:9 Banner', value: 16 / 9 },
+        { label: '9:16 Story', value: 9 / 16 }
+      ];
 
-    const fileInput = document.getElementById('fileInput');
-    const ratioGrid = document.getElementById('ratioGrid');
-    const zoomRange = document.getElementById('zoomRange');
-    const rotationRange = document.getElementById('rotationRange');
-    const zoomValue = document.getElementById('zoomValue');
-    const rotationValue = document.getElementById('rotationValue');
-    const formatSelect = document.getElementById('formatSelect');
-    const exportBtn = document.getElementById('exportBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const statusEl = document.getElementById('status');
-    const editorWrap = document.getElementById('editorWrap');
-    const editorImage = document.getElementById('editorImage');
-    const cropBox = document.getElementById('cropBox');
-    const placeholder = document.getElementById('placeholder');
-    const previewArea = document.getElementById('previewArea');
+      const fileInput = document.getElementById('fileInput');
+      const ratioGrid = document.getElementById('ratioGrid');
+      const zoomRange = document.getElementById('zoomRange');
+      const rotationRange = document.getElementById('rotationRange');
+      const zoomValue = document.getElementById('zoomValue');
+      const rotationValue = document.getElementById('rotationValue');
+      const formatSelect = document.getElementById('formatSelect');
+      const exportBtn = document.getElementById('exportBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const statusEl = document.getElementById('status');
+      const editorWrap = document.getElementById('editorWrap');
+      const editorImage = document.getElementById('editorImage');
+      const cropBox = document.getElementById('cropBox');
+      const placeholder = document.getElementById('placeholder');
+      const previewArea = document.getElementById('previewArea');
 
-    const state = {
-      image: null,
-      imageUrl: '',
-      fileName: 'bild',
-      aspect: 1,
-      zoom: 0,
-      rotation: 0,
-      x: 0,
-      y: 0,
-      dragStartX: 0,
-      dragStartY: 0,
-      startX: 0,
-      startY: 0,
-      dragging: false,
-      outputUrl: '',
-      baseScale: 1,
-      minZoom: 0,
-      maxZoom: 3
-    };
+      const state = {
+        image: null,
+        imageUrl: '',
+        fileName: 'bild',
+        aspect: 1,
+        zoom: 0,
+        rotation: 0,
+        x: 0,
+        y: 0,
+        baseScale: 1,
+        outputUrl: '',
+        dragging: false,
+        dragStartX: 0,
+        dragStartY: 0,
+        startX: 0,
+        startY: 0
+      };
 
-    function setStatus(message = '', isError = false) {
-      statusEl.textContent = message;
-      statusEl.classList.toggle('error', isError);
-    }
+      function setStatus(message = '', isError = false) {
+        statusEl.textContent = message;
+        statusEl.classList.toggle('error', isError);
+      }
 
-    function renderRatioButtons() {
-      ratioGrid.innerHTML = '';
-      ratios.forEach((ratio) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'ratio-btn' + ((state.aspect === ratio.value || (state.aspect === null && ratio.value === null)) ? ' active' : '');
-        btn.textContent = ratio.label;
-        btn.addEventListener('click', () => {
-          state.aspect = ratio.value;
-          renderRatioButtons();
-          updateCropBox();
-          clampPosition();
-          updateImageTransform();
-        });
-        ratioGrid.appendChild(btn);
-      });
-    }
-
-    function updateCropBox() {
-      const wrapW = editorWrap.clientWidth;
-      const wrapH = editorWrap.clientHeight;
-      const maxW = wrapW * 0.72;
-      const maxH = wrapH * 0.72;
-      let boxW, boxH;
-
-      if (state.aspect === null) {
-        boxW = maxW;
-        boxH = maxH;
-      } else {
-        const ratio = state.aspect;
-        boxW = maxW;
-        boxH = boxW / ratio;
-        if (boxH > maxH) {
-          boxH = maxH;
-          boxW = boxH * ratio;
+      function clearOutputUrl() {
+        if (state.outputUrl) {
+          URL.revokeObjectURL(state.outputUrl);
+          state.outputUrl = '';
         }
       }
 
-      cropBox.style.width = boxW + 'px';
-      cropBox.style.height = boxH + 'px';
-    }
-
-    function calculateBaseScale() {
-      if (!state.image) return;
-      const boxW = cropBox.clientWidth;
-      const boxH = cropBox.clientHeight;
-      const fitScale = Math.max(
-        boxW / state.image.naturalWidth,
-        boxH / state.image.naturalHeight
-      );
-      state.baseScale = fitScale;
-    }
-
-    function getCurrentScale() {
-      return state.baseScale * (1 + state.zoom);
-    }
-
-    function updateZoomLabel() {
-      zoomValue.textContent = state.zoom.toFixed(2);
-    }
-
-    function updateImageTransform() {
-      const scale = getCurrentScale();
-      editorImage.style.transform = `translate(calc(-50% + ${state.x}px), calc(-50% + ${state.y}px)) scale(${scale}) rotate(${state.rotation}deg)`;
-    }px), calc(-50% + ${state.y}px)) scale(${state.zoom}) rotate(${state.rotation}deg)`;
-    }
-
-    function getRotatedBounds(width, height, angleDeg, scale) {
-      const angle = angleDeg * Math.PI / 180;
-      const sin = Math.abs(Math.sin(angle));
-      const cos = Math.abs(Math.cos(angle));
-      return {
-        width: (width * cos + height * sin) * scale,
-        height: (width * sin + height * cos) * scale
-      };
-    }
-
-    function clampPosition() {
-      if (!state.image) return;
-      const boxW = cropBox.clientWidth;
-      const boxH = cropBox.clientHeight;
-      const scale = getCurrentScale();
-      const bounds = getRotatedBounds(state.image.naturalWidth, state.image.naturalHeight, state.rotation, scale);
-      const maxX = Math.max(0, (bounds.width - boxW) / 2);
-      const maxY = Math.max(0, (bounds.height - boxH) / 2);
-      state.x = Math.min(maxX, Math.max(-maxX, state.x));
-      state.y = Math.min(maxY, Math.max(-maxY, state.y));
-    }
-
-    function resetEditor() {
-      state.zoom = 0;
-      state.rotation = 0;
-      state.x = 0;
-      state.y = 0;
-      zoomRange.min = String(state.minZoom);
-      zoomRange.max = String(state.maxZoom);
-      zoomRange.value = '0';
-      rotationRange.value = '0';
-      updateZoomLabel();
-      rotationValue.textContent = '0°';
-      renderRatioButtons();
-      updateCropBox();
-      calculateBaseScale();
-      clampPosition();
-      updateImageTransform();
-    }
-
-    function clearOutputUrl() {
-      if (state.outputUrl) {
-        URL.revokeObjectURL(state.outputUrl);
-        state.outputUrl = '';
+      function getCurrentScale() {
+        return state.baseScale * (1 + state.zoom);
       }
-    }
 
-    fileInput.addEventListener('change', (event) => {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
+      function updateZoomLabel() {
+        zoomValue.textContent = state.zoom.toFixed(2);
+      }
 
-      clearOutputUrl();
-      setStatus('');
-      state.fileName = file.name.replace(/\.[^.]+$/, '') || 'bild';
+      function getRotatedBounds(width, height, angleDeg, scale) {
+        const angle = angleDeg * Math.PI / 180;
+        const sin = Math.abs(Math.sin(angle));
+        const cos = Math.abs(Math.cos(angle));
+        return {
+          width: (width * cos + height * sin) * scale,
+          height: (width * sin + height * cos) * scale
+        };
+      }
 
-      const reader = new FileReader();
-      reader.onload = () => {
+      function renderRatioButtons() {
+        ratioGrid.innerHTML = '';
+        ratios.forEach((ratio) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'ratio-btn' + ((state.aspect === ratio.value || (state.aspect === null && ratio.value === null)) ? ' active' : '');
+          btn.textContent = ratio.label;
+          btn.addEventListener('click', () => {
+            state.aspect = ratio.value;
+            renderRatioButtons();
+            updateCropBox();
+            calculateBaseScale();
+            clampPosition();
+            updateImageTransform();
+          });
+          ratioGrid.appendChild(btn);
+        });
+      }
+
+      function updateCropBox() {
+        const wrapW = editorWrap.clientWidth;
+        const wrapH = editorWrap.clientHeight;
+        const maxW = wrapW * 0.72;
+        const maxH = wrapH * 0.72;
+        let boxW;
+        let boxH;
+
+        if (state.aspect === null) {
+          boxW = maxW;
+          boxH = maxH;
+        } else {
+          const ratio = state.aspect;
+          boxW = maxW;
+          boxH = boxW / ratio;
+          if (boxH > maxH) {
+            boxH = maxH;
+            boxW = boxH * ratio;
+          }
+        }
+
+        cropBox.style.width = boxW + 'px';
+        cropBox.style.height = boxH + 'px';
+      }
+
+      function calculateBaseScale() {
+        if (!state.image) return;
+        const boxW = cropBox.clientWidth;
+        const boxH = cropBox.clientHeight;
+        state.baseScale = Math.max(
+          boxW / state.image.naturalWidth,
+          boxH / state.image.naturalHeight
+        );
+      }
+
+      function clampPosition() {
+        if (!state.image) return;
+        const boxW = cropBox.clientWidth;
+        const boxH = cropBox.clientHeight;
+        const bounds = getRotatedBounds(
+          state.image.naturalWidth,
+          state.image.naturalHeight,
+          state.rotation,
+          getCurrentScale()
+        );
+
+        const maxX = Math.max(0, (bounds.width - boxW) / 2);
+        const maxY = Math.max(0, (bounds.height - boxH) / 2);
+        state.x = Math.min(maxX, Math.max(-maxX, state.x));
+        state.y = Math.min(maxY, Math.max(-maxY, state.y));
+      }
+
+      function updateImageTransform() {
+        editorImage.style.transform = `translate(calc(-50% + ${state.x}px), calc(-50% + ${state.y}px)) scale(${getCurrentScale()}) rotate(${state.rotation}deg)`;
+      }
+
+      function resetEditor() {
+        state.zoom = 0;
+        state.rotation = 0;
+        state.x = 0;
+        state.y = 0;
+        zoomRange.value = '0';
+        rotationRange.value = '0';
+        updateZoomLabel();
+        rotationValue.textContent = '0°';
+        updateCropBox();
+        calculateBaseScale();
+        clampPosition();
+        updateImageTransform();
+      }
+
+      function handleLoadedImage(src, fileName) {
         const img = new Image();
         img.onload = () => {
           state.image = img;
-          state.imageUrl = reader.result;
-          editorImage.src = state.imageUrl;
+          state.imageUrl = src;
+          state.fileName = fileName;
+          editorImage.src = src;
           placeholder.classList.add('hidden');
           editorImage.classList.remove('hidden');
           cropBox.classList.remove('hidden');
@@ -540,161 +506,204 @@
           downloadBtn.disabled = true;
           previewArea.innerHTML = '<p class="sub">Nach dem Export erscheint hier deine fertige Vorschau.</p>';
           resetEditor();
+          setStatus('Bild geladen.');
         };
         img.onerror = () => setStatus('Bild konnte nicht geladen werden.', true);
-        img.src = reader.result;
-      };
-      reader.onerror = () => setStatus('Datei konnte nicht gelesen werden.', true);
-      reader.readAsDataURL(file);
-    });
-
-    zoomRange.addEventListener('input', () => {
-      state.zoom = Number(zoomRange.value);
-      updateZoomLabel();
-      clampPosition();
-      updateImageTransform();
-    });
-
-    rotationRange.addEventListener('input', () => {
-      state.rotation = Number(rotationRange.value);
-      rotationValue.textContent = state.rotation + '°';
-      clampPosition();
-      updateImageTransform();
-    });
-
-    function startDrag(clientX, clientY) {
-      if (!state.image) return;
-      state.dragging = true;
-      state.dragStartX = clientX;
-      state.dragStartY = clientY;
-      state.startX = state.x;
-      state.startY = state.y;
-      editorWrap.style.cursor = 'grabbing';
-    }
-
-    function moveDrag(clientX, clientY) {
-      if (!state.dragging) return;
-      const deltaX = clientX - state.dragStartX;
-      const deltaY = clientY - state.dragStartY;
-      state.x = state.startX + deltaX;
-      state.y = state.startY + deltaY;
-      clampPosition();
-      updateImageTransform();
-    }
-
-    function endDrag() {
-      state.dragging = false;
-      editorWrap.style.cursor = 'grab';
-    }
-
-    editorWrap.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
-    window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
-    window.addEventListener('mouseup', endDrag);
-
-    editorWrap.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-      startDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-      moveDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-
-    window.addEventListener('touchend', endDrag);
-    window.addEventListener('resize', () => {
-      updateCropBox();
-      calculateBaseScale();
-      clampPosition();
-      updateImageTransform();
-    });
-
-    exportBtn.addEventListener('click', () => {
-      if (!state.image) return;
-
-      setStatus('Export wird erzeugt ...');
-      clearOutputUrl();
-
-      const wrapRect = editorWrap.getBoundingClientRect();
-      const cropRect = cropBox.getBoundingClientRect();
-      const cropW = Math.round(cropRect.width);
-      const cropH = Math.round(cropRect.height);
-
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) {
-        setStatus('Canvas konnte nicht erstellt werden.', true);
-        return;
+        img.src = src;
       }
 
-      const angle = state.rotation * Math.PI / 180;
-      const sin = Math.abs(Math.sin(angle));
-      const cos = Math.abs(Math.cos(angle));
-      const rotatedW = Math.ceil(state.image.naturalWidth * cos + state.image.naturalHeight * sin);
-      const rotatedH = Math.ceil(state.image.naturalWidth * sin + state.image.naturalHeight * cos);
+      fileInput.addEventListener('change', (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
 
-      tempCanvas.width = rotatedW;
-      tempCanvas.height = rotatedH;
+        clearOutputUrl();
+        setStatus('');
 
-      tempCtx.translate(rotatedW / 2, rotatedH / 2);
-      tempCtx.rotate(angle);
-      tempCtx.scale(getCurrentScale(), getCurrentScale());
-      tempCtx.drawImage(state.image, -state.image.naturalWidth / 2, -state.image.naturalHeight / 2);
-      tempCtx.setTransform(1, 0, 0, 1, 0, 0);
+        const reader = new FileReader();
+        reader.onload = () => {
+          handleLoadedImage(reader.result, file.name.replace(/\.[^.]+$/, '') || 'bild');
+        };
+        reader.onerror = () => setStatus('Datei konnte nicht gelesen werden.', true);
+        reader.readAsDataURL(file);
+      });
 
-      const bounds = getRotatedBounds(state.image.naturalWidth, state.image.naturalHeight, state.rotation, getCurrentScale());
-      const imageLeft = wrapRect.left + wrapRect.width / 2 - bounds.width / 2 + state.x;
-      const imageTop = wrapRect.top + wrapRect.height / 2 - bounds.height / 2 + state.y;
-      const sourceX = ((cropRect.left - imageLeft) / bounds.width) * tempCanvas.width;
-      const sourceY = ((cropRect.top - imageTop) / bounds.height) * tempCanvas.height;
-      const sourceW = (cropRect.width / bounds.width) * tempCanvas.width;
-      const sourceH = (cropRect.height / bounds.height) * tempCanvas.height;
+      zoomRange.addEventListener('input', () => {
+        state.zoom = Number(zoomRange.value);
+        updateZoomLabel();
+        clampPosition();
+        updateImageTransform();
+      });
 
-      const outputCanvas = document.createElement('canvas');
-      const outputCtx = outputCanvas.getContext('2d');
-      if (!outputCtx) {
-        setStatus('Export-Canvas konnte nicht erstellt werden.', true);
-        return;
+      rotationRange.addEventListener('input', () => {
+        state.rotation = Number(rotationRange.value);
+        rotationValue.textContent = state.rotation + '°';
+        clampPosition();
+        updateImageTransform();
+      });
+
+      function startDrag(clientX, clientY) {
+        if (!state.image) return;
+        state.dragging = true;
+        state.dragStartX = clientX;
+        state.dragStartY = clientY;
+        state.startX = state.x;
+        state.startY = state.y;
+        editorWrap.style.cursor = 'grabbing';
       }
 
-      outputCanvas.width = cropW;
-      outputCanvas.height = cropH;
-      outputCtx.drawImage(tempCanvas, sourceX, sourceY, sourceW, sourceH, 0, 0, cropW, cropH);
+      function moveDrag(clientX, clientY) {
+        if (!state.dragging) return;
+        state.x = state.startX + (clientX - state.dragStartX);
+        state.y = state.startY + (clientY - state.dragStartY);
+        clampPosition();
+        updateImageTransform();
+      }
 
-      const format = formatSelect.value;
-      const quality = format === 'image/png' ? undefined : 0.95;
-      outputCanvas.toBlob((blob) => {
-        if (!blob) {
-          setStatus('Export fehlgeschlagen.', true);
+      function endDrag() {
+        state.dragging = false;
+        editorWrap.style.cursor = state.image ? 'grab' : 'default';
+      }
+
+      editorWrap.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+      window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+      window.addEventListener('mouseup', endDrag);
+
+      editorWrap.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        if (touch) startDrag(touch.clientX, touch.clientY);
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        if (touch) moveDrag(touch.clientX, touch.clientY);
+      }, { passive: true });
+
+      window.addEventListener('touchend', endDrag);
+
+      window.addEventListener('resize', () => {
+        updateCropBox();
+        calculateBaseScale();
+        clampPosition();
+        updateImageTransform();
+      });
+
+      exportBtn.addEventListener('click', () => {
+        if (!state.image) return;
+
+        setStatus('Export wird erzeugt ...');
+        clearOutputUrl();
+
+        const cropWDisplay = cropBox.clientWidth;
+        const cropHDisplay = cropBox.clientHeight;
+        const scale = getCurrentScale();
+
+        const sourceX = (state.image.naturalWidth / 2) - (cropWDisplay / 2 + state.x) / scale;
+        const sourceY = (state.image.naturalHeight / 2) - (cropHDisplay / 2 + state.y) / scale;
+        const sourceW = cropWDisplay / scale;
+        const sourceH = cropHDisplay / scale;
+
+        const safeSourceX = Math.max(0, Math.min(state.image.naturalWidth - sourceW, sourceX));
+        const safeSourceY = Math.max(0, Math.min(state.image.naturalHeight - sourceH, sourceY));
+
+        const outputCanvas = document.createElement('canvas');
+        const outputCtx = outputCanvas.getContext('2d');
+        if (!outputCtx) {
+          setStatus('Export-Canvas konnte nicht erstellt werden.', true);
           return;
         }
 
-        state.outputUrl = URL.createObjectURL(blob);
-        const img = document.createElement('img');
-        img.src = state.outputUrl;
-        img.alt = 'Exportierte Vorschau';
-        previewArea.innerHTML = '';
-        previewArea.appendChild(img);
-        downloadBtn.disabled = false;
-        setStatus('Crop erfolgreich erzeugt.');
-      }, format, quality);
-    });
+        outputCanvas.width = Math.round(sourceW);
+        outputCanvas.height = Math.round(sourceH);
 
-    downloadBtn.addEventListener('click', () => {
-      if (!state.outputUrl) return;
-      const ext = formatSelect.value === 'image/jpeg' ? 'jpg' : formatSelect.value === 'image/webp' ? 'webp' : 'png';
-      const link = document.createElement('a');
-      link.href = state.outputUrl;
-      link.download = `${state.fileName}-${state.aspect === 1 ? '1x1' : 'crop'}.${ext}`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    });
+        if (state.rotation !== 0) {
+          const angle = state.rotation * Math.PI / 180;
+          const sin = Math.abs(Math.sin(angle));
+          const cos = Math.abs(Math.cos(angle));
+          const rotatedW = Math.ceil(state.image.naturalWidth * cos + state.image.naturalHeight * sin);
+          const rotatedH = Math.ceil(state.image.naturalWidth * sin + state.image.naturalHeight * cos);
 
-    renderRatioButtons();
-    updateCropBox();
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          if (!tempCtx) {
+            setStatus('Hilfs-Canvas konnte nicht erstellt werden.', true);
+            return;
+          }
+
+          tempCanvas.width = rotatedW;
+          tempCanvas.height = rotatedH;
+          tempCtx.translate(rotatedW / 2, rotatedH / 2);
+          tempCtx.rotate(angle);
+          tempCtx.drawImage(state.image, -state.image.naturalWidth / 2, -state.image.naturalHeight / 2);
+          tempCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+          const rotatedScale = state.baseScale * (1 + state.zoom);
+          const rotatedSourceW = cropWDisplay / rotatedScale;
+          const rotatedSourceH = cropHDisplay / rotatedScale;
+          const rotatedSourceX = (tempCanvas.width / 2) - (rotatedSourceW / 2 + state.x / rotatedScale);
+          const rotatedSourceY = (tempCanvas.height / 2) - (rotatedSourceH / 2 + state.y / rotatedScale);
+
+          outputCanvas.width = Math.round(rotatedSourceW);
+          outputCanvas.height = Math.round(rotatedSourceH);
+          outputCtx.drawImage(
+            tempCanvas,
+            rotatedSourceX,
+            rotatedSourceY,
+            rotatedSourceW,
+            rotatedSourceH,
+            0,
+            0,
+            outputCanvas.width,
+            outputCanvas.height
+          );
+        } else {
+          outputCtx.drawImage(
+            state.image,
+            safeSourceX,
+            safeSourceY,
+            sourceW,
+            sourceH,
+            0,
+            0,
+            outputCanvas.width,
+            outputCanvas.height
+          );
+        }
+
+        const format = formatSelect.value;
+        const quality = format === 'image/png' ? undefined : 0.95;
+        outputCanvas.toBlob((blob) => {
+          if (!blob) {
+            setStatus('Export fehlgeschlagen.', true);
+            return;
+          }
+
+          state.outputUrl = URL.createObjectURL(blob);
+          const img = document.createElement('img');
+          img.src = state.outputUrl;
+          img.alt = 'Exportierte Vorschau';
+          previewArea.innerHTML = '';
+          previewArea.appendChild(img);
+          downloadBtn.disabled = false;
+          setStatus(`Crop erfolgreich erzeugt (${outputCanvas.width} × ${outputCanvas.height}px).`);
+        }, format, quality);
+      });
+
+      downloadBtn.addEventListener('click', () => {
+        if (!state.outputUrl) return;
+        const ext = formatSelect.value === 'image/jpeg' ? 'jpg' : formatSelect.value === 'image/webp' ? 'webp' : 'png';
+        const link = document.createElement('a');
+        link.href = state.outputUrl;
+        link.download = `${state.fileName}-${state.aspect === 1 ? '1x1' : 'crop'}.${ext}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      });
+
+      renderRatioButtons();
+      updateCropBox();
+      updateZoomLabel();
+    })();
   </script>
 </body>
 </html>
+
