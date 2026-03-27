@@ -230,7 +230,6 @@
     }
     .toast.show{ opacity:1; }
 
-    /* Accessibility box */
     .a11y{
       margin-top:10px;
       border:1px solid var(--border);
@@ -280,7 +279,6 @@
     .badge.ok{ color:var(--ok); }
     .badge.bad{ color:var(--bad); }
 
-    /* Small helper layout for two inputs in one row */
     .grow{ flex:1 1 180px; min-width:180px; }
     .fixed{ flex:0 0 auto; }
   </style>
@@ -289,7 +287,6 @@
 <body>
   <div class="wrap">
     <div class="grid">
-      <!-- LEFT: Generator -->
       <div class="card">
         <h1>Background-Color Finder (für deine Produktfarbe)</h1>
 
@@ -308,7 +305,6 @@
         <div class="swatches" id="swatches"></div>
       </div>
 
-      <!-- RIGHT: Preview -->
       <div class="card">
         <h1>Live Preview</h1>
 
@@ -327,6 +323,7 @@
         <div class="row">
           <select id="bgSelect" class="btn" style="flex:1">
             <option value="auto">Auto (beste Lesbarkeit)</option>
+            <option value="custom">Custom (Preview Input)</option>
           </select>
           <button class="btn" id="copyCSS">Copy CSS</button>
         </div>
@@ -534,7 +531,6 @@
     ratioHint.textContent = `Kontrastverhältnis: ${formatCR(cr)} (Text ${text} auf BG ${bg})`;
   };
 
-  // ===== Source for suggestions: LEFT input OR RIGHT custom input =====
   const getPreviewInputHex = () => {
     if (inputMode.value === 'linked') {
       return normalizeHex(hexEl.value) || '#51533B';
@@ -568,9 +564,14 @@
 
   const currentBgFromUI = (suggestions) => {
     if (bgSelect.value === 'auto') {
-      const best = [...suggestions].sort((a,b)=>b.autoContrast-a.autoContrast)[0];
+      const best = [...suggestions].sort((a, b) => b.autoContrast - a.autoContrast)[0];
       return best.bg;
     }
+
+    if (bgSelect.value === 'custom') {
+      return getPreviewInputHex();
+    }
+
     return bgSelect.value;
   };
 
@@ -583,19 +584,26 @@
     const input = getPreviewInputHex();
     const suggestions = suggestBackgrounds(input);
 
-    // rebuild dropdown options each time to match current preview input
     const prevValue = bgSelect.value;
-    bgSelect.innerHTML = `<option value="auto">Auto (beste Lesbarkeit)</option>`;
+
+    bgSelect.innerHTML = `
+      <option value="auto">Auto (beste Lesbarkeit)</option>
+      <option value="custom">Custom (Preview Input)</option>
+    `;
+
     suggestions.forEach((s, idx) => {
-      const label = idx === 0 ? 'Hell' : idx === suggestions.length-1 ? 'Dunkel' : 'Neutral';
+      const label = idx === 0 ? 'Hell' : idx === suggestions.length - 1 ? 'Dunkel' : 'Neutral';
       const opt = document.createElement('option');
       opt.value = s.bg;
       opt.textContent = `${label}: ${s.bg}`;
       bgSelect.appendChild(opt);
     });
-    // try restore selection if still exists
-    if ([...bgSelect.options].some(o => o.value === prevValue)) bgSelect.value = prevValue;
-    else bgSelect.value = 'auto';
+
+    if ([...bgSelect.options].some(o => o.value === prevValue)) {
+      bgSelect.value = prevValue;
+    } else {
+      bgSelect.value = inputMode.value === 'custom' ? 'custom' : 'auto';
+    }
 
     const bestBg = [...suggestions].sort((a,b)=>b.autoContrast-a.autoContrast)[0];
     bestHint.innerHTML = `Best Guess (Auto): <b>${bestBg.bg}</b> mit Auto-Text <b>${bestBg.autoText}</b> (Kontrast ${formatCR(bestBg.autoContrast)})`;
@@ -629,7 +637,6 @@
     textPicker.style.opacity = isCustomText ? '1' : '.55';
   };
 
-  // LEFT swatches generator (stays based on LEFT input)
   const renderSwatches = (inputHex) => {
     const suggestions = suggestBackgrounds(inputHex);
     swatchesEl.innerHTML = '';
@@ -669,15 +676,18 @@
     picker.value = n;
     renderSwatches(n);
 
-    // keep preview linked if needed
     syncPreviewInputUI();
     applyPreview();
   };
 
-  // ===== Events =====
   hexEl.addEventListener('input', () => {
     const n = normalizeHex(hexEl.value);
-    if (n) { picker.value = n; renderSwatches(n); syncPreviewInputUI(); applyPreview(); }
+    if (n) {
+      picker.value = n;
+      renderSwatches(n);
+      syncPreviewInputUI();
+      applyPreview();
+    }
   });
 
   picker.addEventListener('input', () => {
@@ -695,7 +705,6 @@
     updateLeft();
   });
 
-  // Swatches actions: copy / use BG
   swatchesEl.addEventListener('click', (e) => {
     const copyBtn = e.target.closest('[data-copy]');
     if (copyBtn) return copy(copyBtn.getAttribute('data-copy'));
@@ -709,9 +718,15 @@
     }
   });
 
-  // Preview input mode
   inputMode.addEventListener('change', () => {
     syncPreviewInputUI();
+
+    if (inputMode.value === 'custom') {
+      bgSelect.value = 'custom';
+    } else if (bgSelect.value === 'custom') {
+      bgSelect.value = 'auto';
+    }
+
     applyPreview();
   });
 
@@ -721,7 +736,8 @@
     if (n) {
       previewHex.value = n;
       previewPicker.value = n;
-      applyPreview();
+      if (bgSelect.value === 'custom') applyPreview();
+      else applyPreview();
     }
   });
 
@@ -736,7 +752,6 @@
 
   bgSelect.addEventListener('change', applyPreview);
 
-  // Text controls
   textMode.addEventListener('change', applyPreview);
 
   textHex.addEventListener('input', () => {
@@ -756,7 +771,6 @@
     }
   });
 
-  // Copy CSS
   copyCSSBtn.addEventListener('click', () => {
     const input = getPreviewInputHex();
     const suggestions = suggestBackgrounds(input);
@@ -766,12 +780,10 @@
     copy(txt);
   });
 
-  // Init
   const nT = normalizeHex(textHex.value) || '#111111';
   textHex.value = nT;
   textPicker.value = nT;
 
-  // init preview input values
   const initLeft = normalizeHex(hexEl.value) || '#51533B';
   hexEl.value = initLeft;
   picker.value = initLeft;
