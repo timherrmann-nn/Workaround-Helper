@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>HSB Background Generator</title>
+<style>
+  body{
+    font-family: system-ui, -apple-system, sans-serif;
+    background:#f6f6f6;
+    padding:20px;
+  }
+
+  .picker{
+    max-width:420px;
+    background:#fff;
+    padding:16px;
+    border-radius:12px;
+    box-shadow:0 4px 16px rgba(0,0,0,.08);
+  }
+
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    margin-top:12px;
+  }
+
+  input{
+    width:100%;
+    padding:8px;
+    margin-top:4px;
+    font-size:14px;
+  }
+
+  .result{
+    margin-top:16px;
+    padding:16px;
+    border-radius:10px;
+    color:#fff;
+    font-weight:700;
+    text-align:center;
+  }
+
+  .hex{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.9;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="picker">
+
+  <label>Produktfarbe (HEX)</label>
+  <input type="text" id="inputHex" value="#f9d81c">
+
+  <label>Sättigung (S %) – fix</label>
+  <input type="number" id="inputS" value="100" min="0" max="100">
+
+  <label>Helligkeit (B %) – fix</label>
+  <input type="number" id="inputB" value="35" min="0" max="100">
+
+  <div class="result" id="preview">
+    Background Vorschau
+    <div class="hex" id="outputHex">#595100</div>
+  </div>
+
+</div>
+
+<script>
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  if(hex.length === 3){
+    hex = hex.split('').map(c => c + c).join('');
+  }
+  const num = parseInt(hex,16);
+  return {
+    r:(num>>16)&255,
+    g:(num>>8)&255,
+    b:num&255
+  };
+}
+
+function rgbToHsb(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const d = max - min;
+  let h = 0;
+
+  if(d){
+    if(max===r) h=((g-b)/d)%6;
+    else if(max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h*=60;
+    if(h<0) h+=360;
+  }
+
+  return {
+    h: Math.round(h),
+    s: max===0 ? 0 : d/max*100,
+    b: max*100
+  };
+}
+
+function hsbToRgb(h,s,b){
+  s/=100; b/=100;
+  const k = n => (n + h/60) % 6;
+  const f = n => b * (1 - s * Math.max(0, Math.min(k(n),4-k(n),1)));
+  return {
+    r:Math.round(255*f(5)),
+    g:Math.round(255*f(3)),
+    b:Math.round(255*f(1))
+  };
+}
+
+function rgbToHex({r,g,b}){
+  return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+}
+
+function update(){
+  const hex = document.getElementById('inputHex').value;
+  const S = Number(document.getElementById('inputS').value);
+  const B = Number(document.getElementById('inputB').value);
+
+  const rgb = hexToRgb(hex);
+  const hsb = rgbToHsb(rgb.r,rgb.g,rgb.b);
+
+  const newRgb = hsbToRgb(hsb.h,S,B);
+  const outHex = rgbToHex(newRgb);
+
+  const preview = document.getElementById('preview');
+  preview.style.background = outHex;
+  document.getElementById('outputHex').textContent = outHex;
+}
+
+document.querySelectorAll('input').forEach(i =>
+  i.addEventListener('input', update)
+);
+
+update();
+</script>
+
+</body>
+</html>
