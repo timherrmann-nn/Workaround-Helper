@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor Hub</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #111827;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 760px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(229, 231, 235, 0.7);
+      box-shadow: var(--shadow);
+      padding: 32px;
+    }
+
+    h1, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 34px;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .button-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .hub-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: var(--accent);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .hub-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(17, 24, 39, 0.16);
+    }
+
+    .hub-button small {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.82;
+      margin-top: 4px;
+    }
+
+    .arrow {
+      flex-shrink: 0;
+      font-size: 20px;
+      opacity: 0.9;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 24px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .hub-button {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="card">
+      <h1>Editor Hub</h1>
+      <p class="sub">
+        Zentrale Startseite für deine Tools. Trage hier einfach die Links zu deinen Editoren ein und nutze die Datei als Hauptseite in deinem GitHub-Repository.
+      </p>
+
+      <div class="button-list">
+        <a class="hub-button" href="./foto-editor.html">
+          <span>
+            Foto-Editor
+            <small>Bilder zuschneiden und Formate wählen</small>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="hub-button" href="./editor-2.html">
+          <span>
+            Editor 2
+            <small>Link hier auf dein nächstes Tool setzen</small>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="hub-button" href="./editor-3.html">
+          <span>
+            Editor 3
+            <small>Platzhalter für weiteres Tool</small>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="hub-button" href="./editor-4.html">
+          <span>
+            Editor 4
+            <small>Platzhalter für weiteres Tool</small>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+
+      <p class="footer-note">
+        Tipp: Wenn die Seite im Hauptverzeichnis liegt, benenne sie als <strong>index.html</strong>, damit GitHub Pages sie direkt als Startseite nutzt.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
