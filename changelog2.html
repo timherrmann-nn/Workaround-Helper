@@ -231,7 +231,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .v-card:hover{box-shadow:0 20px 42px rgba(34,57,50,.1);transform:translateY(-3px);border-color:#cbd5cf}
 @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .v-card-head{display:flex;align-items:center;gap:12px;padding:18px 20px 16px;background:linear-gradient(135deg,#f9faf8 0%, #f1f3ef 100%);border-bottom:1px solid rgba(216,221,215,.92);flex-wrap:wrap}
-.v-tag{font-family:'Playfair Display',serif;font-size:1.28rem;font-weight:700;color:var(--brown-dark);letter-spacing:-.03em}
+.v-tag{font-family:'Arial',serif;font-size:1.28rem;font-weight:700;color:var(--brown-dark);letter-spacing:-.03em}
 .v-date{font-size:.8rem;color:var(--text-muted)}
 .v-card-actions{margin-left:auto;display:flex;gap:6px}
 .v-card-body{padding:18px 20px 20px}
@@ -933,7 +933,7 @@ function renderEntries() {
     card.className = 'v-card';
     card.innerHTML = `
       <div class="v-card-head">
-        <div><div class="v-tag">v${hl(esc(entry.version),q)}</div><div class="v-date">${fmtDate(entry.date)}</div></div>
+        <div><div class="v-tag">${hl(esc(entry.version),q)}</div><div class="v-date">${fmtDate(entry.date)}</div></div>
         <div class="v-card-actions">
           <button class="btn btn-outline btn-sm" data-edit="${eA(entry.version)}">✏️ Bearbeiten</button>
           <button class="btn btn-danger btn-sm"  data-del="${eA(entry.version)}">🗑</button>
