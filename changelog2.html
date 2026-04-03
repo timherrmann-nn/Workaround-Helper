@@ -9,65 +9,165 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
 :root {
-  --cream:       #FBF5EC;
-  --cream-dark:  #F2E8D9;
-  --gold:        #C9A961;
-  --gold-light:  #D4B97A;
-  --gold-dark:   #A88840;
-  --brown:       #8B6F47;
-  --brown-dark:  #5C4730;
-  --brown-light: #B08B61;
-  --text:        #2C1F0E;
-  --text-muted:  #7A6348;
-  --border:      #DDD0BC;
-  --shadow:      rgba(139,111,71,0.15);
-  --radius:      12px;
-  --radius-sm:   8px;
-  --radius-lg:   18px;
-  --tr:          0.2s cubic-bezier(0.4,0,0.2,1);
+  --cream:       #f6f4ef;
+  --cream-dark:  #ece8df;
+  --gold:        #d86f4a;
+  --gold-light:  #ea8f67;
+  --gold-dark:   #b65534;
+  --brown:       #45635a;
+  --brown-dark:  #223932;
+  --brown-light: #6d8e83;
+  --text:        #1d2522;
+  --text-muted:  #62716b;
+  --border:      #d8ddd7;
+  --shadow:      rgba(34,57,50,0.12);
+  --radius:      16px;
+  --radius-sm:   12px;
+  --radius-lg:   24px;
+  --tr:          0.22s cubic-bezier(0.4,0,0.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;line-height:1.6}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(234,143,103,.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(109,142,131,.18), transparent 26%),
+    linear-gradient(180deg, #fbfaf7 0%, var(--cream) 38%, #f2efe8 100%);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.6;
+}
 
 /* ── HEADER ── */
-#app-header{background:linear-gradient(135deg,var(--brown-dark) 0%,var(--brown) 60%,var(--brown-light) 100%);position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(44,31,14,.25)}
-.header-inner{max-width:920px;margin:0 auto;padding:18px 24px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#app-header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(18px);
+  background:rgba(251,250,247,.82);
+  border-bottom:1px solid rgba(216,221,215,.85);
+  box-shadow:0 10px 30px rgba(34,57,50,.08);
+}
+.header-inner{max-width:980px;margin:0 auto;padding:18px 24px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .header-brand{flex:1;min-width:180px}
-.header-brand h1{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--cream);line-height:1.2}
-.version-badge{display:inline-block;background:rgba(201,169,97,.3);border:1px solid var(--gold-light);color:var(--gold-light);font-size:.75rem;font-weight:600;padding:2px 10px;border-radius:20px;margin-top:4px;letter-spacing:.04em}
+.header-brand h1{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--brown-dark);line-height:1.15;letter-spacing:-.02em}
+.version-badge{
+  display:inline-block;
+  background:rgba(216,111,74,.12);
+  border:1px solid rgba(216,111,74,.22);
+  color:var(--gold-dark);
+  font-size:.75rem;
+  font-weight:700;
+  padding:5px 12px;
+  border-radius:999px;
+  margin-top:8px;
+  letter-spacing:.05em;
+}
 .header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 /* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:all var(--tr);text-decoration:none;white-space:nowrap}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:10px 18px;
+  border-radius:var(--radius-sm);
+  font-family:'DM Sans',sans-serif;
+  font-size:.875rem;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  transition:all var(--tr);
+  text-decoration:none;
+  white-space:nowrap;
+}
 .btn:active{transform:scale(.97)}
-.btn-primary{background:var(--gold);color:var(--brown-dark);font-weight:600}
-.btn-primary:hover{background:var(--gold-light);box-shadow:0 4px 16px rgba(201,169,97,.4)}
-.btn-ghost{background:rgba(255,255,255,.12);color:var(--cream);border:1px solid rgba(255,255,255,.2)}
-.btn-ghost:hover{background:rgba(255,255,255,.22)}
-.btn-outline{background:transparent;color:var(--brown);border:1.5px solid var(--border)}
-.btn-outline:hover{border-color:var(--gold);color:var(--gold-dark);background:rgba(201,169,97,.06)}
+.btn-primary{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 100%);color:#fff;font-weight:700;box-shadow:0 10px 24px rgba(216,111,74,.22)}
+.btn-primary:hover{box-shadow:0 14px 28px rgba(216,111,74,.28);transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--brown-dark);border:1px solid rgba(216,221,215,.95);box-shadow:0 6px 18px rgba(34,57,50,.05)}
+.btn-ghost:hover{background:#f9faf8;border-color:#c9d3cd}
+.btn-outline{background:transparent;color:var(--brown-dark);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:#b8c5bf;color:var(--brown-dark);background:rgba(255,255,255,.72)}
 .btn-danger{background:transparent;color:#c0392b;border:1.5px solid #e8b0ab}
 .btn-danger:hover{background:#fdf0f0;border-color:#F44336}
-.btn-success{background:#4CAF50;color:#fff}
-.btn-success:hover{background:#43a047;box-shadow:0 4px 14px rgba(76,175,80,.3)}
+.btn-success{background:linear-gradient(135deg,#2d8f72 0%,#46a988 100%);color:#fff}
+.btn-success:hover{box-shadow:0 8px 18px rgba(45,143,114,.25);transform:translateY(-1px)}
 .btn-sm{padding:6px 12px;font-size:.8rem}
+.fab-add{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  width:58px;
+  height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--brown-dark) 0%, var(--brown) 100%);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 18px 40px rgba(34,57,50,.26);
+  font-size:2rem;
+  font-weight:700;
+  line-height:1;
+  z-index:250;
+}
+.fab-add:hover{
+  transform:translateY(-2px);
+  box-shadow:0 22px 44px rgba(34,57,50,.3);
+}
+.fab-add:active{transform:scale(.96)}
 
 /* ── MAIN ── */
-#main{max-width:920px;margin:0 auto;padding:28px 24px 80px}
+#main{max-width:980px;margin:0 auto;padding:34px 24px 96px}
 
 /* ── SEARCH ── */
-.search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-bar{
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(216,221,215,.9);
+  box-shadow:0 10px 24px rgba(34,57,50,.06);
+  border-radius:22px;
+  padding:14px;
+  backdrop-filter:blur(10px);
+}
 .search-wrap{flex:1;min-width:200px;position:relative}
-.search-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
-.search-input{width:100%;padding:10px 14px 10px 40px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.9rem;background:#fff;color:var(--text);transition:border var(--tr),box-shadow var(--tr)}
+.search-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--brown-light);pointer-events:none}
+.search-input{
+  width:100%;
+  padding:14px 16px 14px 46px;
+  border:1.5px solid rgba(216,221,215,.95);
+  border-radius:16px;
+  font-family:'DM Sans',sans-serif;
+  font-size:.94rem;
+  background:#fff;
+  color:var(--text);
+  transition:border var(--tr),box-shadow var(--tr),transform var(--tr);
+}
 .search-input::placeholder{color:var(--text-muted)}
-.search-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,97,.18)}
+.search-input:focus{outline:none;border-color:rgba(216,111,74,.38);box-shadow:0 0 0 4px rgba(216,111,74,.12)}
 
 /* ── FILTER CHIPS ── */
-.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;align-items:center}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;align-items:center}
 .filter-label{font-size:.78rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all var(--tr);user-select:none}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:.79rem;
+  font-weight:600;
+  cursor:pointer;
+  border:1px solid transparent;
+  transition:all var(--tr);
+  user-select:none;
+  box-shadow:0 4px 10px rgba(34,57,50,.05);
+}
 .chip input{display:none}
 .chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .chip[data-cat="Neu"]             {border-color:#a8d5a9;background:#f0faf0;color:#2e7d32}
@@ -75,68 +175,96 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
 .chip[data-cat="Fixes"]           {border-color:#ffcc80;background:#fff8e1;color:#e65100}
 .chip[data-cat="Breaking Changes"]{border-color:#ef9a9a;background:#fff5f5;color:#b71c1c}
 .chip[data-cat="Known Issues"]    {border-color:#e0e0e0;background:#f5f5f5;color:#424242}
-.chip.off{opacity:.38}
+.chip.off{opacity:.42;filter:saturate(.75)}
 
 /* ── FORM PANEL ── */
 #form-panel{display:none;margin-bottom:28px;animation:slideDown .25s ease both}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.form-card{background:#fff;border:2px solid var(--gold);border-radius:var(--radius-lg);padding:24px 26px 22px;box-shadow:0 6px 28px rgba(139,111,71,.13)}
+.form-card{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(216,221,215,.9);
+  border-radius:var(--radius-lg);
+  padding:28px 28px 24px;
+  box-shadow:0 18px 40px rgba(34,57,50,.08);
+  backdrop-filter:blur(10px);
+}
 .panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.panel-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--brown-dark);display:flex;align-items:center;gap:8px}
+.panel-title{font-family:'Playfair Display',serif;font-size:1.18rem;color:var(--brown-dark);display:flex;align-items:center;gap:8px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 @media(max-width:540px){.form-row{grid-template-columns:1fr}}
 .form-group{display:flex;flex-direction:column;gap:5px}
 label.fld{font-size:.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em}
-input[type="text"],input[type="date"],select{padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);background:var(--cream);transition:border var(--tr),box-shadow var(--tr)}
-input[type="text"]:focus,input[type="date"]:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,97,.2);background:#fff}
-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath fill='%238B6F47' d='M0.5 0.5l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px}
+input[type="text"],input[type="date"],input[type="password"],select{
+  padding:11px 14px;
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:.9rem;
+  color:var(--text);
+  background:#fbfcfb;
+  transition:border var(--tr),box-shadow var(--tr),background var(--tr);
+}
+input[type="text"]:focus,input[type="date"]:focus,input[type="password"]:focus,select:focus{outline:none;border-color:rgba(216,111,74,.4);box-shadow:0 0 0 4px rgba(216,111,74,.12);background:#fff}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath fill='%2362716b' d='M0.5 0.5l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
 
 /* ── ITEMS EDITOR ── */
 .items-editor{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-.item-row{display:flex;gap:8px;align-items:center;background:var(--cream);border-radius:var(--radius-sm);padding:7px 9px;border:1px solid var(--border);animation:rowIn .18s ease both}
+.item-row{display:flex;gap:8px;align-items:center;background:#f8f9f7;border-radius:14px;padding:8px 9px;border:1px solid var(--border);animation:rowIn .18s ease both}
 @keyframes rowIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
 .item-row select{flex:0 0 155px}
 .item-row input{flex:1;min-width:0}
-.btn-rm{flex-shrink:0;width:32px;height:32px;border-radius:6px;background:#fff;border:1.5px solid #e8b0ab;color:#c0392b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all var(--tr);padding:0;font-family:inherit}
+.btn-rm{flex-shrink:0;width:34px;height:34px;border-radius:10px;background:#fff;border:1.5px solid #e8b0ab;color:#c0392b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all var(--tr);padding:0;font-family:inherit}
 .btn-rm:hover{background:#fdf0f0}
 .form-actions{display:flex;gap:10px;flex-wrap:wrap;padding-top:4px}
 
 /* ── VERSION CARDS ── */
-.entries-list{display:flex;flex-direction:column;gap:18px}
-.v-card{background:#fff;border-radius:var(--radius-lg);border:1.5px solid var(--border);overflow:hidden;transition:box-shadow var(--tr),transform var(--tr);animation:cardIn .28s ease both}
-.v-card:hover{box-shadow:0 8px 32px var(--shadow);transform:translateY(-2px)}
+.entries-list{display:flex;flex-direction:column;gap:20px}
+.v-card{
+  background:rgba(255,255,255,.9);
+  border-radius:var(--radius-lg);
+  border:1px solid rgba(216,221,215,.95);
+  overflow:hidden;
+  transition:box-shadow var(--tr),transform var(--tr),border-color var(--tr);
+  animation:cardIn .28s ease both;
+  box-shadow:0 12px 28px rgba(34,57,50,.06);
+}
+.v-card:hover{box-shadow:0 20px 42px rgba(34,57,50,.1);transform:translateY(-3px);border-color:#cbd5cf}
 @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.v-card-head{display:flex;align-items:center;gap:12px;padding:16px 20px 14px;background:linear-gradient(135deg,var(--cream-dark),var(--cream));border-bottom:1px solid var(--border);flex-wrap:wrap}
-.v-tag{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--brown-dark);letter-spacing:-.02em}
+.v-card-head{display:flex;align-items:center;gap:12px;padding:18px 20px 16px;background:linear-gradient(135deg,#f9faf8 0%, #f1f3ef 100%);border-bottom:1px solid rgba(216,221,215,.92);flex-wrap:wrap}
+.v-tag{font-family:'Playfair Display',serif;font-size:1.28rem;font-weight:700;color:var(--brown-dark);letter-spacing:-.03em}
 .v-date{font-size:.8rem;color:var(--text-muted)}
 .v-card-actions{margin-left:auto;display:flex;gap:6px}
-.v-card-body{padding:16px 20px 18px}
+.v-card-body{padding:18px 20px 20px}
 .cat-block+.cat-block{margin-top:12px}
-.cat-label{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 9px;border-radius:20px;margin-bottom:7px}
+.cat-label{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:999px;margin-bottom:8px}
 .cat-dot{width:6px;height:6px;border-radius:50%}
 .item-list{list-style:none;display:flex;flex-direction:column;gap:4px}
-.item-list li{font-size:.88rem;padding:4px 0 4px 16px;position:relative;border-bottom:1px dashed rgba(0,0,0,.05)}
+.item-list li{font-size:.92rem;padding:6px 0 6px 18px;position:relative;border-bottom:1px dashed rgba(34,57,50,.08)}
 .item-list li:last-child{border-bottom:none}
-.item-list li::before{content:'';position:absolute;left:3px;top:12px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.item-list li::before{content:'';position:absolute;left:3px;top:14px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
 
 /* ── EMPTY ── */
-.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state{text-align:center;padding:76px 20px;color:var(--text-muted);background:rgba(255,255,255,.65);border:1px dashed #cfd8d2;border-radius:24px}
 .empty-state .icon{font-size:2.8rem;margin-bottom:10px}
 .empty-state p{font-size:1rem;margin-bottom:5px;color:var(--text)}
 .empty-state small{font-size:.83rem}
 
 /* ── MODAL ── */
-.modal-bg{position:fixed;inset:0;background:rgba(44,31,14,.5);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .2s ease;padding:20px}
+.modal-bg{position:fixed;inset:0;background:rgba(29,37,34,.44);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .2s ease;padding:20px;backdrop-filter:blur(8px)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:#fff;border-radius:var(--radius-lg);padding:30px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(44,31,14,.2);animation:modalIn .28s cubic-bezier(.175,.885,.32,1.275)}
+.modal{background:#fff;border-radius:var(--radius-lg);padding:30px;max-width:420px;width:100%;box-shadow:0 28px 70px rgba(29,37,34,.18);animation:modalIn .28s cubic-bezier(.175,.885,.32,1.275);border:1px solid rgba(216,221,215,.95)}
 @keyframes modalIn{from{opacity:0;transform:scale(.93) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--brown-dark);margin-bottom:8px}
 .modal p{color:var(--text-muted);font-size:.88rem;margin-bottom:22px}
+.modal-note{font-size:.8rem;color:var(--text-muted);margin-top:-10px;margin-bottom:16px;line-height:1.5}
+.modal-error{font-size:.82rem;color:#c0392b;min-height:20px;margin:6px 0 12px}
+.modal-check{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--text-muted);cursor:pointer;user-select:none;margin:4px 0 16px}
+.modal-check input{accent-color:var(--gold-dark)}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end}
 
 /* ── TOAST ── */
 #toasts{position:fixed;bottom:24px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{background:var(--brown-dark);color:var(--cream);padding:11px 18px;border-radius:var(--radius);font-size:.86rem;font-weight:500;box-shadow:0 8px 28px rgba(44,31,14,.28);animation:tIn .3s cubic-bezier(.175,.885,.32,1.275) both;display:flex;align-items:center;gap:9px;pointer-events:all;max-width:300px}
+.toast{background:var(--brown-dark);color:#fff;padding:12px 18px;border-radius:16px;font-size:.86rem;font-weight:500;box-shadow:0 10px 28px rgba(34,57,50,.24);animation:tIn .3s cubic-bezier(.175,.885,.32,1.275) both;display:flex;align-items:center;gap:9px;pointer-events:all;max-width:320px}
 .toast.success{border-left:4px solid #4CAF50}
 .toast.error  {border-left:4px solid #F44336}
 .toast.info   {border-left:4px solid var(--gold)}
@@ -150,41 +278,48 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 
 /* ── LOADING ── */
 #loading{position:fixed;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:12px}
-.spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:sp .65s linear infinite}
+.spin{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:sp .65s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 #loading p{color:var(--text-muted);font-size:.88rem}
 
 /* ── HIGHLIGHT ── */
-mark.hl{background:rgba(201,169,97,.28);border-radius:2px;padding:0 1px;color:inherit}
+mark.hl{background:rgba(216,111,74,.18);border-radius:6px;padding:0 3px;color:inherit}
 
 /* ── PASSWORD SCREEN ── */
-#pw-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--brown-dark) 0%,var(--brown) 55%,var(--brown-light) 100%);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}
-.pw-box{background:var(--cream);border-radius:var(--radius-lg);padding:42px 38px 36px;max-width:420px;width:100%;box-shadow:0 32px 80px rgba(44,31,14,.4);text-align:center;animation:modalIn .38s cubic-bezier(.175,.885,.32,1.275)}
+#pw-screen{position:fixed;inset:0;background:radial-gradient(circle at top left, rgba(234,143,103,.28), transparent 32%),linear-gradient(135deg,#234039 0%, #38574f 58%, #6d8e83 100%);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}
+.pw-box{background:rgba(251,250,247,.94);border-radius:28px;padding:42px 38px 36px;max-width:440px;width:100%;box-shadow:0 32px 80px rgba(22,34,30,.34);text-align:center;animation:modalIn .38s cubic-bezier(.175,.885,.32,1.275);border:1px solid rgba(255,255,255,.38);backdrop-filter:blur(12px)}
 .pw-logo{font-size:2.8rem;margin-bottom:8px;line-height:1}
 .pw-box h2{font-family:'Playfair Display',serif;font-size:1.55rem;color:var(--brown-dark);margin-bottom:6px}
 .pw-box p{font-size:.85rem;color:var(--text-muted);margin-bottom:28px;line-height:1.5}
 .pw-lock-icon{font-size:1rem;margin-right:4px}
 .pw-input-wrap{position:relative;margin-bottom:6px}
-.pw-input{width:100%;padding:13px 46px 13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:1.05rem;color:var(--text);background:#fff;transition:border var(--tr),box-shadow var(--tr);text-align:center;letter-spacing:.12em}
+.pw-input-wrap + .pw-input-wrap{margin-top:12px}
+.pw-input{width:100%;padding:14px 46px 14px 16px;border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1.05rem;color:var(--text);background:#fff;transition:border var(--tr),box-shadow var(--tr);text-align:center;letter-spacing:.12em}
 .pw-input::placeholder{letter-spacing:normal;color:var(--text-muted)}
-.pw-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,97,.22)}
+.pw-input:focus{outline:none;border-color:rgba(216,111,74,.42);box-shadow:0 0 0 4px rgba(216,111,74,.14)}
 .pw-input.err{border-color:#F44336;box-shadow:0 0 0 3px rgba(244,67,54,.15)}
 .pw-input.shake{animation:shake .38s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.15rem;padding:6px;line-height:1;transition:color var(--tr)}
-.pw-toggle:hover{color:var(--brown)}
+.pw-toggle:hover{color:var(--brown-dark)}
 .pw-error{font-size:.82rem;color:#c0392b;min-height:20px;margin:6px 0 14px;font-weight:500;text-align:center}
+.pw-strength{min-height:18px;margin:8px 0 12px;font-size:.8rem;color:var(--text-muted)}
+.pw-strength strong{color:var(--brown-dark)}
+.pw-hint{font-size:.78rem;color:var(--text-muted);margin:-8px 0 16px;line-height:1.45}
+.pw-hint.hidden{display:none}
 .pw-remember{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:22px;font-size:.84rem;color:var(--text-muted);cursor:pointer;user-select:none}
-.pw-remember input{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
-.pw-btn{width:100%;padding:13px;background:var(--gold);color:var(--brown-dark);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all var(--tr);letter-spacing:.02em}
-.pw-btn:hover{background:var(--gold-light);box-shadow:0 4px 18px rgba(201,169,97,.45)}
+.pw-remember input{width:15px;height:15px;cursor:pointer;accent-color:var(--gold-dark)}
+.pw-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 100%);color:#fff;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all var(--tr);letter-spacing:.02em;box-shadow:0 12px 24px rgba(216,111,74,.22)}
+.pw-btn:hover{box-shadow:0 16px 28px rgba(216,111,74,.26);transform:translateY(-1px)}
 .pw-btn:active{transform:scale(.98)}
-.pw-enc-badge{margin-top:20px;font-size:.74rem;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:5px;opacity:.7}
+.pw-enc-badge{margin-top:20px;font-size:.74rem;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:5px;opacity:.82}
 
 @media(max-width:600px){
   .header-inner{padding:14px 16px;gap:10px}
-  .header-brand h1{font-size:1.2rem}
-  #main{padding:18px 14px 60px}
+  .header-brand h1{font-size:1.26rem}
+  #main{padding:18px 14px 68px}
+  .fab-add{right:16px;bottom:16px;width:54px;height:54px;border-radius:14px}
+  .search-bar{padding:10px;border-radius:18px}
   .v-card-head{padding:12px 15px}
   .v-card-body{padding:12px 15px 15px}
   .form-card{padding:18px 14px}
@@ -200,8 +335,8 @@ mark.hl{background:rgba(201,169,97,.28);border-radius:2px;padding:0 1px;color:in
 <div id="pw-screen">
   <div class="pw-box">
     <div class="pw-logo">🥜</div>
-    <h2>Naughty Nuts</h2>
-    <p><span class="pw-lock-icon">🔐</span>Changelog ist verschlüsselt.<br>Bitte Passwort eingeben.</p>
+    <h2 id="pw-title">Naughty Nuts</h2>
+    <p id="pw-copy"><span class="pw-lock-icon">🔐</span>Changelog ist verschlüsselt.<br>Bitte Passwort eingeben.</p>
     <div class="pw-input-wrap">
       <input type="password" class="pw-input" id="pw-input"
         placeholder="Passwort eingeben…"
@@ -209,13 +344,22 @@ mark.hl{background:rgba(201,169,97,.28);border-radius:2px;padding:0 1px;color:in
         autocomplete="current-password" />
       <button class="pw-toggle" id="pw-toggle" onclick="toggleVis()" title="Anzeigen/Verbergen">👁</button>
     </div>
+    <div class="pw-input-wrap" id="pw-confirm-wrap" style="display:none">
+      <input type="password" class="pw-input" id="pw-confirm"
+        placeholder="Passwort wiederholen…"
+        onkeydown="if(event.key==='Enter') submitPw()"
+        autocomplete="new-password" />
+      <button class="pw-toggle" id="pw-confirm-toggle" onclick="toggleVis('pw-confirm','pw-confirm-toggle')" title="Anzeigen/Verbergen">👁</button>
+    </div>
+    <div class="pw-strength" id="pw-strength"></div>
+    <div class="pw-hint hidden" id="pw-hint">Mindestens 10 Zeichen mit Großbuchstabe, Kleinbuchstabe, Zahl und Sonderzeichen.</div>
     <div class="pw-error" id="pw-error"></div>
     <label class="pw-remember">
       <input type="checkbox" id="pw-remember" checked />
       Angemeldet bleiben (in diesem Browser)
     </label>
-    <button class="pw-btn" onclick="submitPw()">Entsperren →</button>
-    <div class="pw-enc-badge"></div>
+    <button class="pw-btn" id="pw-submit" onclick="submitPw()">Entsperren →</button>
+    <div class="pw-enc-badge">🔒 AES-256-GCM verschlüsselt</div>
   </div>
 </div>
 
@@ -231,6 +375,7 @@ mark.hl{background:rgba(201,169,97,.28);border-radius:2px;padding:0 1px;color:in
     </div>
     <div class="header-actions">
       <button class="btn btn-primary btn-sm" onclick="openForm(null)">➕ Neue Version</button>
+      <button class="btn btn-ghost btn-sm" onclick="openSettings()">⚙ Passwort</button>
       <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Export</button>
       <label class="btn btn-ghost btn-sm" style="cursor:pointer">
         ⬆ Import
@@ -247,7 +392,7 @@ mark.hl{background:rgba(201,169,97,.28);border-radius:2px;padding:0 1px;color:in
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
-      <input type="text" class="search-input" id="search-input" placeholder="Nach Version oder Änderung suchen…" oninput="onSearch()" />
+      <input type="text" class="search-input" id="search-input" placeholder="     Nach Version oder Änderung suchen…" oninput="onSearch()" />
     </div>
   </div>
   <div class="filter-bar" id="filter-bar"></div>
@@ -283,6 +428,8 @@ mark.hl{background:rgba(201,169,97,.28);border-radius:2px;padding:0 1px;color:in
 
   <div class="entries-list" id="entries-list"></div>
 </main>
+
+<button class="btn fab-add" onclick="openForm(null)" aria-label="Neue Version hinzufügen" title="Neue Version hinzufügen">+</button>
 
 <div id="toasts"></div>
 <div id="modal-wrap"></div>
@@ -352,8 +499,10 @@ async function decryptData(stored, password) {
    ──────────────────────────────────────────────────────────────── */
 const STORAGE_KEY  = 'nn_cl_enc';
 const REMEMBER_KEY = 'nn_cl_rem';
-
-const MASTER_HASH  = '8a716490c059482076fee5e4e7cd927eab5ff19db8adc41ac265856b65bd7aaf';
+const MASTER_WRAP_KEY = 'nn_cl_master_wrap';
+const MASTER_PASSWORD = 'NN-2026#';
+const LEGACY_MASTER_HASH = '8a716490c059482076fee5e4e7cd927eab5ff19db8adc41ac265856b65bd7aaf';
+const MIN_PASSWORD_LENGTH = 10;
 
 /* SHA-256 eines Strings → Hex */
 async function sha256hex(str) {
@@ -361,10 +510,10 @@ async function sha256hex(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-/* Prüfen ob ein Passwort das Master-Passwort ist (Hash-Vergleich) */
-async function isMasterPw(pw) {
+/* Nur für Alt-Daten: altes fest eingebautes Passwort erkennen */
+async function isLegacyMasterPw(pw) {
   const h = await sha256hex(pw);
-  return h === MASTER_HASH;
+  return h === LEGACY_MASTER_HASH;
 }
 const CATS   = ['Neu','Geändert','Fixes','Breaking Changes','Known Issues'];
 const CAT_COL= {'Neu':'#4CAF50','Geändert':'#2196F3','Fixes':'#FF9800','Breaking Changes':'#F44336','Known Issues':'#9E9E9E'};
@@ -410,6 +559,11 @@ let activeFilters   = new Set(CATS);
 let searchQ         = '';
 let editingVersion  = null;
 let formRows        = [{category:'Neu', text:''}];
+let pwMode          = 'unlock';
+
+function cloneInitialEntries() {
+  return INITIAL_DATA.entries.map(entry => ({ ...entry, items: entry.items.map(item => ({ ...item })) }));
+}
 
 /* ────────────────────────────────────────────────────────────────
    PASSWORT-SCREEN
@@ -432,9 +586,14 @@ function getDeviceSalt() {
 
 // Passwort verschlüsselt im localStorage ablegen
 async function saveRememberPw(pw) {
-  const salt     = fromB64(getDeviceSalt());
-  const enc      = await encryptData(pw, toB64(salt) + 'remember');
+  const salt = getDeviceSalt(); // Base64-String direkt als Key-Material
+  const enc  = await encryptData(pw, salt + ':remember');
   localStorage.setItem(REMEMBER_KEY, enc);
+}
+
+async function saveUserPwForMaster(pw) {
+  const enc = await encryptData(pw, MASTER_PASSWORD);
+  localStorage.setItem(MASTER_WRAP_KEY, enc);
 }
 
 // Gespeichertes Passwort entschlüsseln und zurückgeben (oder null)
@@ -442,23 +601,133 @@ async function loadRememberPw() {
   const stored = localStorage.getItem(REMEMBER_KEY);
   if (!stored) return null;
   try {
-    const salt = fromB64(getDeviceSalt());
-    return await decryptData(stored, toB64(salt) + 'remember');
+    const salt = getDeviceSalt(); // gleicher String wie beim Speichern
+    return await decryptData(stored, salt + ':remember');
   } catch(e) {
+    localStorage.removeItem(REMEMBER_KEY);
     return null;
   }
 }
 
-function toggleVis() {
-  const inp = document.getElementById('pw-input');
-  const btn = document.getElementById('pw-toggle');
+async function loadUserPwForMaster() {
+  const stored = localStorage.getItem(MASTER_WRAP_KEY);
+  if (!stored) return null;
+  try {
+    return await decryptData(stored, MASTER_PASSWORD);
+  } catch(e) {
+    localStorage.removeItem(MASTER_WRAP_KEY);
+    return null;
+  }
+}
+
+function hasRememberedSession() {
+  return Boolean(localStorage.getItem(REMEMBER_KEY));
+}
+
+function toggleVis(inputId='pw-input', buttonId='pw-toggle') {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(buttonId);
   inp.type        = inp.type === 'password' ? 'text' : 'password';
   btn.textContent = inp.type === 'password' ? '👁' : '🙈';
   inp.focus();
 }
 
+function hasStoredData() {
+  return Boolean(localStorage.getItem(STORAGE_KEY));
+}
+
+function passwordStrength(pw) {
+  const checks = [
+    pw.length >= MIN_PASSWORD_LENGTH,
+    /[a-z]/.test(pw),
+    /[A-Z]/.test(pw),
+    /\d/.test(pw),
+    /[^A-Za-z0-9]/.test(pw)
+  ];
+  return {
+    valid: checks.every(Boolean),
+    score: checks.filter(Boolean).length
+  };
+}
+
+function getPasswordValidationMessage(pw, confirmPw='') {
+  if (!pw) return 'Bitte ein Passwort eingeben.';
+  if (pw.length < MIN_PASSWORD_LENGTH) return `Bitte mindestens ${MIN_PASSWORD_LENGTH} Zeichen verwenden.`;
+  if (!/[a-z]/.test(pw)) return 'Mindestens ein Kleinbuchstabe fehlt.';
+  if (!/[A-Z]/.test(pw)) return 'Mindestens ein Großbuchstabe fehlt.';
+  if (!/\d/.test(pw)) return 'Mindestens eine Zahl fehlt.';
+  if (!/[^A-Za-z0-9]/.test(pw)) return 'Mindestens ein Sonderzeichen fehlt.';
+  if (confirmPw !== '' && pw !== confirmPw) return 'Die Passwörter stimmen nicht überein.';
+  return '';
+}
+
+function updatePasswordStrength() {
+  const strengthEl = document.getElementById('pw-strength');
+  const pw = document.getElementById('pw-input').value;
+  if (pwMode !== 'setup') {
+    strengthEl.textContent = '';
+    return;
+  }
+  if (!pw) {
+    strengthEl.textContent = '';
+    return;
+  }
+  const { score, valid } = passwordStrength(pw);
+  const labels = ['sehr schwach', 'schwach', 'okay', 'gut', 'sehr stark'];
+  const label = labels[Math.max(0, score - 1)];
+  strengthEl.innerHTML = `Passwortstärke: <strong>${valid ? 'geeignet' : label}</strong>`;
+}
+
+function setPwMode(mode) {
+  pwMode = mode;
+  const isSetup = mode === 'setup';
+  document.getElementById('pw-title').textContent = isSetup ? 'Passwort anlegen' : 'Naughty Nuts';
+  document.getElementById('pw-copy').innerHTML = isSetup
+    ? '<span class="pw-lock-icon">🛡️</span>Lege beim ersten Start ein sicheres Passwort fest.<br>Damit werden deine Daten verschlüsselt gespeichert.'
+    : '<span class="pw-lock-icon">🔐</span>Changelog ist verschlüsselt.<br>Bitte Passwort eingeben.';
+  document.getElementById('pw-confirm-wrap').style.display = isSetup ? 'block' : 'none';
+  document.getElementById('pw-hint').classList.toggle('hidden', !isSetup);
+  const pwInput = document.getElementById('pw-input');
+  const confirmInput = document.getElementById('pw-confirm');
+  pwInput.placeholder = isSetup ? 'Sicheres Passwort wählen…' : 'Passwort eingeben…';
+  pwInput.autocomplete = isSetup ? 'new-password' : 'current-password';
+  confirmInput.value = '';
+  document.getElementById('pw-submit').textContent = isSetup ? 'Passwort speichern →' : 'Entsperren →';
+  document.getElementById('pw-error').textContent = '';
+  updatePasswordStrength();
+}
+
+async function setupFirstPassword(pw, confirmPw, remember) {
+  const validationError = getPasswordValidationMessage(pw, confirmPw);
+  if (validationError) {
+    showPwError(validationError);
+    return null;
+  }
+  entries = cloneInitialEntries();
+  theme = INITIAL_DATA.theme;
+  currentVersion = INITIAL_DATA.currentVersion;
+  await persistWithPassword(pw);
+  await saveUserPwForMaster(pw);
+  activePassword = pw;
+  if (remember) await saveRememberPw(pw);
+  else localStorage.removeItem(REMEMBER_KEY);
+  return true;
+}
+
+function showPwError(message) {
+  const errEl = document.getElementById('pw-error');
+  const inp = document.getElementById('pw-input');
+  errEl.textContent = message;
+  inp.classList.remove('shake');
+  void inp.offsetWidth;
+  inp.classList.add('shake');
+  inp.classList.add('err');
+  setTimeout(() => inp.classList.remove('err'), 600);
+}
+
 async function submitPw() {
   const pw      = document.getElementById('pw-input').value;
+  const confirmPw = document.getElementById('pw-confirm').value;
   const remember= document.getElementById('pw-remember').checked;
   const errEl   = document.getElementById('pw-error');
   const inp     = document.getElementById('pw-input');
@@ -473,77 +742,79 @@ async function submitPw() {
 
   errEl.textContent = '';
   inp.disabled = true;
-  document.querySelector('.pw-btn').textContent = 'Prüfe…';
+  document.getElementById('pw-submit').textContent = pwMode === 'setup' ? 'Speichere…' : 'Prüfe…';
+  document.getElementById('pw-confirm').disabled = true;
 
   try {
-    const unlocked = await attemptUnlock(pw);
+    let unlocked = false;
+    if (pwMode === 'setup') {
+      unlocked = await setupFirstPassword(pw, confirmPw, remember);
+    } else {
+      unlocked = await attemptUnlock(pw);
+      if (unlocked) {
+        if (remember) await saveRememberPw(activePassword || pw);
+        else localStorage.removeItem(REMEMBER_KEY);
+      }
+    }
 
     if (unlocked) {
-      // Master-PW nie im Remember-Me speichern
-      const master = await isMasterPw(pw);
-      if (remember && !master) await saveRememberPw(pw);
-      else if (!master)        localStorage.removeItem(REMEMBER_KEY);
       hidePwScreen();
       bootApp();
+    } else if (unlocked === null) {
+      inp.focus();
     } else {
-      errEl.textContent = '❌ Falsches Passwort.';
-      inp.classList.remove('shake');
-      void inp.offsetWidth;
-      inp.classList.add('shake');
-      inp.classList.add('err');
-      setTimeout(() => inp.classList.remove('err'), 600);
+      showPwError('❌ Falsches Passwort.');
       inp.disabled = false;
       inp.value    = '';
       inp.focus();
-      document.querySelector('.pw-btn').textContent = 'Entsperren →';
+      document.getElementById('pw-submit').textContent = pwMode === 'setup' ? 'Passwort speichern →' : 'Entsperren →';
     }
   } catch(e) {
     // Unerwarteter Fehler — Input immer wieder freischalten
     console.error('submitPw error:', e);
     errEl.textContent = '⚠️ Fehler: ' + (e.message || 'Unbekannt');
     inp.disabled = false;
-    document.querySelector('.pw-btn').textContent = 'Entsperren →';
+    document.getElementById('pw-submit').textContent = pwMode === 'setup' ? 'Passwort speichern →' : 'Entsperren →';
+  } finally {
+    inp.disabled = false;
+    document.getElementById('pw-confirm').disabled = false;
+    updatePasswordStrength();
   }
 }
 
 // Kernfunktion: Passwort prüfen durch Entschlüsselung der echten Daten.
-// Master-PW: kann immer entsperren — legt Daten neu an wenn nötig.
+// Für Alt-Daten bleibt das frühere feste Passwort als Migrationspfad erhalten.
 // Gibt true/false zurück, befüllt bei Erfolg den App-State.
+async function unlockWithDataPassword(dataPassword) {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (!stored) return false;
+  const plain = await decryptData(stored, dataPassword);
+  const data  = JSON.parse(plain);
+  entries        = data.entries        || [];
+  theme          = data.theme          || theme;
+  currentVersion = data.currentVersion || currentVersion;
+  activePassword = dataPassword;
+  return true;
+}
+
 async function attemptUnlock(pw) {
-  const master = await isMasterPw(pw);
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        // Normaler Entschlüsselungsversuch mit eingegebenem Passwort
-        const plain = await decryptData(stored, pw);
-        const data  = JSON.parse(plain);
-        entries        = data.entries        || [];
-        theme          = data.theme          || theme;
-        currentVersion = data.currentVersion || currentVersion;
-      } catch(decryptErr) {
-        // Entschlüsselung fehlgeschlagen
-        if (master) {
-          // Master-PW: Daten existieren aber wurden mit anderem PW verschlüsselt.
-          // → Daten gehen verloren wenn kein anderes PW bekannt. Hier: leere DB anlegen.
-          // In der Praxis sollte das nie passieren wenn Master-PW nicht als User-PW genutzt wird.
-          entries        = INITIAL_DATA.entries;
-          theme          = INITIAL_DATA.theme;
-          currentVersion = INITIAL_DATA.currentVersion;
-          await persistWithPassword(pw);
-        } else {
-          return false; // Normales falsches Passwort
-        }
-      }
-    } else {
-      // Keine Daten vorhanden → Initialdaten mit diesem Passwort verschlüsseln
-      entries        = INITIAL_DATA.entries;
-      theme          = INITIAL_DATA.theme;
-      currentVersion = INITIAL_DATA.currentVersion;
-      await persistWithPassword(pw);
+    if (!hasStoredData()) return false;
+
+    try {
+      await unlockWithDataPassword(pw);
+      await saveUserPwForMaster(pw);
+      return true;
+    } catch(decryptErr) {
+      const legacyMaster = await isLegacyMasterPw(pw);
+      if (!legacyMaster) return false;
+
+      const userPw = await loadUserPwForMaster();
+      if (!userPw) return false;
+
+      await unlockWithDataPassword(userPw);
+      return true;
     }
-    activePassword = pw;
-    return true;
   } catch(e) {
     return false;
   }
@@ -562,7 +833,9 @@ async function tryRememberLogin() {
   if (!savedPw) return false;
   // Das gespeicherte Passwort MUSS die echten Daten entschlüsseln können
   // → kein Bypass möglich
-  return await attemptUnlock(savedPw);
+  const ok = await attemptUnlock(savedPw);
+  if (!ok) localStorage.removeItem(REMEMBER_KEY);
+  return ok;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -770,6 +1043,76 @@ function confirmDelete(version) {
   bg.querySelector('#mbtn-del').addEventListener('click',()=>doDelete(version));
 }
 function closeModal(){ document.getElementById('modal-wrap').innerHTML=''; }
+
+function openSettings() {
+  const wrap = document.getElementById('modal-wrap');
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h3>Passwort verwalten</h3>
+      <p>Vergib hier ein neues Nutzerpasswort fur deinen Changelog.</p>
+      <div class="modal-note">Das Master-Passwort bleibt unverandert bestehen und wird durch diese Anderung nie uberschrieben.</div>
+      <div class="form-group">
+        <label class="fld" for="settings-new-pw">Neues Passwort</label>
+        <input type="password" id="settings-new-pw" placeholder="Neues sicheres Passwort" autocomplete="new-password" />
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="fld" for="settings-confirm-pw">Passwort wiederholen</label>
+        <input type="password" id="settings-confirm-pw" placeholder="Passwort wiederholen" autocomplete="new-password" />
+      </div>
+      <label class="modal-check">
+        <input type="checkbox" id="settings-remember"${hasRememberedSession() ? ' checked' : ''} />
+        Angemeldet bleiben mit dem neuen Passwort
+      </label>
+      <div class="modal-error" id="settings-error"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="settings-cancel">Abbrechen</button>
+        <button class="btn btn-primary" id="settings-save">💾 Passwort speichern</button>
+      </div>
+    </div>`;
+  wrap.innerHTML = '';
+  wrap.appendChild(bg);
+  bg.addEventListener('click', e => { if (e.target === bg) closeModal(); });
+  bg.querySelector('#settings-cancel').addEventListener('click', closeModal);
+  bg.querySelector('#settings-save').addEventListener('click', submitPasswordChange);
+  bg.querySelector('#settings-confirm-pw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitPasswordChange();
+  });
+  bg.querySelector('#settings-new-pw').focus();
+}
+
+async function submitPasswordChange() {
+  const nextPw = document.getElementById('settings-new-pw')?.value || '';
+  const confirmPw = document.getElementById('settings-confirm-pw')?.value || '';
+  const remember = document.getElementById('settings-remember')?.checked;
+  const errorEl = document.getElementById('settings-error');
+  if (!errorEl) return;
+
+  const validationError = getPasswordValidationMessage(nextPw, confirmPw);
+  if (validationError) {
+    errorEl.textContent = validationError;
+    return;
+  }
+  if (!activePassword) {
+    errorEl.textContent = 'Kein aktiver Login vorhanden. Bitte neu anmelden.';
+    return;
+  }
+
+  try {
+    activePassword = nextPw;
+    await persistWithPassword(nextPw);
+    await saveUserPwForMaster(nextPw);
+    if (remember) await saveRememberPw(nextPw);
+    else localStorage.removeItem(REMEMBER_KEY);
+    closeModal();
+    toast('Neues Passwort gespeichert. Das Master-Passwort bleibt aktiv.','success');
+  } catch (e) {
+    console.error('password change error:', e);
+    errorEl.textContent = 'Das Passwort konnte nicht gespeichert werden.';
+  }
+}
+
 async function doDelete(version) {
   entries=entries.filter(e=>e.version!==version);
   const sorted=[...entries].sort((a,b)=>cmpVer(b.version,a.version));
@@ -846,6 +1189,14 @@ function doConfetti(){
    ──────────────────────────────────────────────────────────────── */
 (async function init(){
   const ov = document.getElementById('loading');
+  document.getElementById('pw-input').addEventListener('input', () => {
+    document.getElementById('pw-error').textContent = '';
+    updatePasswordStrength();
+  });
+  document.getElementById('pw-confirm').addEventListener('input', () => {
+    if (pwMode === 'setup') document.getElementById('pw-error').textContent = '';
+  });
+  setPwMode(hasStoredData() ? 'unlock' : 'setup');
 
   // Wenn WebCrypto nicht verfügbar: direkt PW-Screen zeigen mit Hinweis
   if (!cryptoAvailable()) {
@@ -862,6 +1213,7 @@ function doConfetti(){
   // Auto-Login versuchen (Remember-Me)
   const autoOk = await tryRememberLogin();
   if (autoOk) {
+    hidePwScreen();
     bootApp();
   } else {
     ov.style.transition='opacity .3s ease'; ov.style.opacity='0';
