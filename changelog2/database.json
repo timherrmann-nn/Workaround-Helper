@@ -1,0 +1,98 @@
+{
+  "theme": "Naughty Nuts Theme",
+  "currentVersion": "1.1.2",
+  "entries": [
+    {
+      "version": "1.1.2",
+      "date": "2026-04-02",
+      "items": [
+        {
+          "category": "Geändert",
+          "text": "Sticky Add-to-Cart Mobile optimiert - Z-Index und Touch-Feedback verbessert"
+        },
+        {
+          "category": "Fixes",
+          "text": "Farbkontrast CTA-Buttons auf WCAG AA angehoben (Ratio 4.8:1)"
+        },
+        {
+          "category": "Fixes",
+          "text": "Meta Pixel Sandbox-Warnung in Browser-Konsole behoben"
+        },
+        {
+          "category": "Known Issues",
+          "text": "iOS Safari: Sticky Header bei schnellem Scroll gelegentlich flackernd"
+        }
+      ]
+    },
+    {
+      "version": "1.1.1",
+      "date": "2026-03-18",
+      "items": [
+        {
+          "category": "Neu",
+          "text": "Mix & Save Bundle-Tool: Dynamische Rabatt-Badges nach Tier-Level"
+        },
+        {
+          "category": "Neu",
+          "text": "Discount-Code wird automatisch via /checkout?discount= übergeben"
+        },
+        {
+          "category": "Geändert",
+          "text": "Variant-Selection Modal: Mobile Sticky Bottom Bar implementiert"
+        },
+        {
+          "category": "Fixes",
+          "text": "Cart-Submit via /cart/add.js mit line_item_properties korrigiert"
+        }
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-03-05",
+      "items": [
+        {
+          "category": "Neu",
+          "text": "Category Button Slider Section: Horizontales Scrollen mit Snap + Pfeil-Navigation"
+        },
+        {
+          "category": "Neu",
+          "text": "Media Grid Section: Per-Block Row-Height Override eingebaut"
+        },
+        {
+          "category": "Neu",
+          "text": "Bio-Zertifizierungs-Badge DE-OeKO-006 im Footer integriert"
+        },
+        {
+          "category": "Geändert",
+          "text": "Email-Templates auf Warm-Design-System migriert (Beige/Braun/Gold)"
+        },
+        {
+          "category": "Breaking Changes",
+          "text": "Knofedt-Font muss manuell in Theme-Assets hochgeladen sein"
+        }
+      ]
+    },
+    {
+      "version": "1.0.5",
+      "date": "2026-02-12",
+      "items": [
+        {
+          "category": "Neu",
+          "text": "DSGVO/Cookie-Compliance-Audit abgeschlossen, WCAG A/AA-Fixes umgesetzt"
+        },
+        {
+          "category": "Geändert",
+          "text": "Make (Integromat) Automation: Tally -> Google Sheets -> Shopify Influencer-Flow"
+        },
+        {
+          "category": "Fixes",
+          "text": "Web Pixel Sandbox Fehler bei Consent-Mode V2 behoben"
+        },
+        {
+          "category": "Fixes",
+          "text": "Focus-Styles für alle interaktiven Elemente nachgeruestet"
+        }
+      ]
+    }
+  ]
+}
