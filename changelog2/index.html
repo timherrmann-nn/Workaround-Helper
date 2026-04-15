@@ -438,6 +438,9 @@ mark.hl{background:rgba(216,111,74,.18);border-radius:6px;padding:0 3px;color:in
 
 <div id="toasts"></div>
 <div id="modal-wrap"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ════════════════════════════════════════════════════════════
      JAVASCRIPT
@@ -505,15 +508,19 @@ async function decryptData(stored, password) {
 const STORAGE_KEY  = 'nn_cl_enc';
 const REMEMBER_KEY = 'nn_cl_rem';
 const MASTER_WRAP_KEY = 'nn_cl_master_wrap';
-const GITHUB_TOKEN_KEY = 'nn_cl_github_token';
 const MASTER_PASSWORD = 'NN-2026#';
 const LEGACY_MASTER_HASH = '8a716490c059482076fee5e4e7cd927eab5ff19db8adc41ac265856b65bd7aaf';
 const MIN_PASSWORD_LENGTH = 10;
-const GITHUB_OWNER = 'timherrmann-nn';
-const GITHUB_REPO = 'Workaround-Helper';
-const GITHUB_BRANCH = 'main';
-const GITHUB_DATABASE_PATH = 'changelog2/database.json';
-const AUTO_SYNC_INTERVAL_MS = 30 * 60 * 1000;
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyCFvASjxd151tIv22H39NqVrXqhkCAhOME',
+  authDomain: 'changelog-nn.firebaseapp.com',
+  projectId: 'changelog-nn',
+  storageBucket: 'changelog-nn.firebasestorage.app',
+  messagingSenderId: '419954074412',
+  appId: '1:419954074412:web:ad59b4ae83d32591a84289'
+};
+const FIRESTORE_COLLECTION = 'changelog';
+const FIRESTORE_DOC_ID = 'main';
 
 /* SHA-256 eines Strings → Hex */
 async function sha256hex(str) {
@@ -562,9 +569,9 @@ let searchQ         = '';
 let editingVersion  = null;
 let formRows        = [{category:'Neu', text:''}];
 let pwMode          = 'unlock';
-let pendingGitHubSync = false;
-let syncInFlight = false;
-let autoSyncTimer = null;
+let firestoreReady  = false;
+let firestoreDocRef = null;
+let seedSource      = 'fallback';
 
 function cloneInitialEntries() {
   return cloneData(seedData).entries;
@@ -598,13 +605,47 @@ function normalizeData(data) {
 }
 
 async function loadSharedSeedData() {
+  if (firestoreReady && firestoreDocRef) {
+    try {
+      const snap = await firestoreDocRef.get();
+      if (snap.exists) {
+        seedData = normalizeData(snap.data());
+        seedSource = 'firestore';
+        return;
+      }
+    } catch (error) {
+      console.warn('Firestore load failed, fallback to file:', error);
+    }
+  }
+
   try {
     const response = await fetch(SHARED_DB_URL, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     seedData = normalizeData(await response.json());
+    seedSource = 'file';
   } catch (error) {
     console.warn('Shared database fallback aktiv:', error);
     seedData = cloneData(FALLBACK_DATA);
+    seedSource = 'fallback';
+  }
+}
+
+async function initFirestore() {
+  if (typeof firebase === 'undefined') {
+    console.warn('Firebase SDK nicht geladen.');
+    return;
+  }
+
+  try {
+    const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(FIREBASE_CONFIG);
+    const auth = app.auth();
+    const db = app.firestore();
+    await auth.signInAnonymously();
+    firestoreDocRef = db.collection(FIRESTORE_COLLECTION).doc(FIRESTORE_DOC_ID);
+    firestoreReady = true;
+  } catch (error) {
+    console.error('Firestore init failed:', error);
+    firestoreReady = false;
   }
 }
 
@@ -665,19 +706,6 @@ async function loadUserPwForMaster() {
 
 function hasRememberedSession() {
   return Boolean(localStorage.getItem(REMEMBER_KEY));
-}
-
-function getGitHubToken() {
-  return sessionStorage.getItem(GITHUB_TOKEN_KEY) || '';
-}
-
-function hasGitHubToken() {
-  return Boolean(getGitHubToken());
-}
-
-function saveGitHubToken(token) {
-  if (token) sessionStorage.setItem(GITHUB_TOKEN_KEY, token);
-  else sessionStorage.removeItem(GITHUB_TOKEN_KEY);
 }
 
 function toggleVis(inputId='pw-input', buttonId='pw-toggle') {
@@ -915,111 +943,27 @@ function getDatabasePayload() {
   });
 }
 
-function hasUnsyncedChanges() {
-  return JSON.stringify(getDatabasePayload()) !== JSON.stringify(normalizeData(seedData));
-}
-
-async function githubRequest(url, options = {}) {
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Accept': 'application/vnd.github+json',
-      'Authorization': `Bearer ${getGitHubToken()}`,
-      ...(options.headers || {})
-    }
-  });
-
-  if (!response.ok) {
-    let message = `GitHub-Request fehlgeschlagen (${response.status}).`;
-    try {
-      const errorData = await response.json();
-      if (errorData?.message) message = `${message} ${errorData.message}`;
-    } catch (error) {
-      console.warn('GitHub error response parse failed:', error);
-    }
-    throw new Error(message);
-  }
-
-  return response;
-}
-
-async function pushDatabaseToGitHub() {
-  const token = getGitHubToken();
-  if (!token) throw new Error('Bitte zuerst einen GitHub-Token in den Einstellungen hinterlegen.');
-
+async function persistToFirestore() {
+  if (!firestoreReady || !firestoreDocRef) return false;
   const payload = getDatabasePayload();
-  const contentUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATABASE_PATH}`;
-  let sha = null;
-
-  try {
-    const getResponse = await githubRequest(`${contentUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`);
-    const currentFile = await getResponse.json();
-    sha = currentFile.sha || null;
-  } catch (error) {
-    if (!String(error.message || '').includes('(404)')) throw error;
-  }
-
-  const body = {
-    message: `Update ${GITHUB_DATABASE_PATH}`,
-    content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
-    branch: GITHUB_BRANCH
-  };
-  if (sha) body.sha = sha;
-
-  await githubRequest(contentUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
+  await firestoreDocRef.set({
+    ...payload,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
-
   seedData = cloneData(payload);
-}
-
-async function syncDatabaseToGitHub(options = {}) {
-  const { showSuccessToast = false, showMissingTokenToast = false } = options;
-  if (!pendingGitHubSync || syncInFlight) return false;
-  if (!hasGitHubToken()) {
-    if (showMissingTokenToast) {
-      toast('Lokal gespeichert. Fuer den Repo-Sync bitte zuerst einen GitHub-Token hinterlegen.','info');
-    }
-    return false;
-  }
-
-  syncInFlight = true;
-  try {
-    await pushDatabaseToGitHub();
-    pendingGitHubSync = false;
-    if (showSuccessToast) {
-      toast('Repo-Sync erfolgreich. database.json wurde direkt aktualisiert.','success');
-    }
-    return true;
-  } catch (error) {
-    console.error('syncDatabaseToGitHub error:', error);
-    toast(error.message || 'Repo-Sync fehlgeschlagen. Daten bleiben lokal gespeichert.','error');
-    return false;
-  } finally {
-    syncInFlight = false;
-  }
-}
-
-function queueGitHubSync(options = {}) {
-  pendingGitHubSync = true;
-  void syncDatabaseToGitHub(options);
-}
-
-function startAutoSync() {
-  if (autoSyncTimer) clearInterval(autoSyncTimer);
-  autoSyncTimer = window.setInterval(() => {
-    if (pendingGitHubSync) void syncDatabaseToGitHub();
-  }, AUTO_SYNC_INTERVAL_MS);
+  return true;
 }
 
 async function persist() {
-  if (!activePassword) { toast('Kein aktives Passwort – bitte neu laden.','error'); return; }
+  if (!activePassword) { toast('Kein aktives Passwort – bitte neu laden.','error'); return { cloudOk:false }; }
   await persistWithPassword(activePassword);
-  pendingGitHubSync = true;
+  try {
+    const cloudOk = await persistToFirestore();
+    return { cloudOk };
+  } catch (error) {
+    console.error('Firestore persist failed:', error);
+    return { cloudOk: false, cloudError: error };
+  }
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -1037,17 +981,19 @@ function cmpVer(a,b){ const pa=a.split('.').map(n=>parseInt(n)||0),pb=b.split('.
    APP BOOTEN (nach erfolgreichem Login)
    ──────────────────────────────────────────────────────────────── */
 function bootApp() {
-  pendingGitHubSync = hasUnsyncedChanges();
+  if (seedSource === 'firestore') {
+    entries = cloneInitialEntries();
+    theme = seedData.theme;
+    currentVersion = seedData.currentVersion;
+    if (activePassword) {
+      void persistWithPassword(activePassword);
+    }
+  }
   updateHeader();
   renderFilters();
   renderEntries();
   document.getElementById('f-date').value = todayISO();
   renderRows();
-  startAutoSync();
-  window.addEventListener('online', () => { if (pendingGitHubSync) void syncDatabaseToGitHub(); });
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && pendingGitHubSync) void syncDatabaseToGitHub();
-  });
   // Loading verstecken
   const ov = document.getElementById('loading');
   ov.style.transition = 'opacity .3s ease';
@@ -1208,10 +1154,10 @@ async function saveVersion() {
   const sorted = [...entries].sort((a,b)=>cmpVer(b.version,a.version));
   currentVersion = sorted[0]?.version || version;
   try {
-    await persist();
+    const saveResult = await persist();
     updateHeader(); renderEntries(); closeForm();
-    toast(`Version ${version} lokal gespeichert.`,'success');
-    queueGitHubSync({ showMissingTokenToast: true });
+    if (saveResult.cloudOk) toast(`Version ${version} gespeichert und mit Firestore synchronisiert.`,'success');
+    else toast(`Version ${version} lokal gespeichert. Firestore-Sync folgt, sobald die Verbindung steht.`,'info');
     doConfetti();
   } catch (error) {
     entries = previousEntries;
@@ -1242,19 +1188,7 @@ function openSettings() {
   bg.className = 'modal-bg';
   bg.innerHTML = `
     <div class="modal">
-      <h3>Einstellungen</h3>
-      <p>Hier verwaltest du dein lokales Passwort und den GitHub-Zugang fuer globale Updates.</p>
-      <div class="modal-note">Der GitHub-Token bleibt nur in dieser Browser-Sitzung gespeichert. Er sollte nur Rechte fuer Contents auf diesem Repo haben.</div>
-      <div class="form-group">
-        <label class="fld" for="settings-gh-token">GitHub Token</label>
-        <input type="password" id="settings-gh-token" placeholder="Fine-grained Token mit Contents: Read and write" autocomplete="off" />
-      </div>
-      <div class="modal-note">${hasGitHubToken() ? 'GitHub-Token ist fuer diese Sitzung gesetzt.' : 'Noch kein GitHub-Token hinterlegt.'}</div>
-      <div class="modal-actions" style="margin-bottom:16px">
-        <button class="btn btn-outline" id="settings-gh-clear">Token entfernen</button>
-        <button class="btn btn-primary" id="settings-gh-save">GitHub Token speichern</button>
-      </div>
-      <hr style="border:none;border-top:1px solid rgba(216,221,215,.95);margin:0 0 18px" />
+      <h3>Passwort verwalten</h3>
       <p>Vergib hier ein neues Nutzerpasswort fur deinen Changelog.</p>
       <div class="modal-note">Das Master-Passwort bleibt unverandert bestehen und wird durch diese Anderung nie uberschrieben.</div>
       <div class="form-group">
@@ -1280,38 +1214,10 @@ function openSettings() {
   bg.addEventListener('click', e => { if (e.target === bg) closeModal(); });
   bg.querySelector('#settings-cancel').addEventListener('click', closeModal);
   bg.querySelector('#settings-save').addEventListener('click', submitPasswordChange);
-  bg.querySelector('#settings-gh-save').addEventListener('click', submitGitHubToken);
-  bg.querySelector('#settings-gh-clear').addEventListener('click', clearGitHubToken);
   bg.querySelector('#settings-confirm-pw').addEventListener('keydown', e => {
     if (e.key === 'Enter') submitPasswordChange();
   });
-  bg.querySelector('#settings-gh-token').addEventListener('keydown', e => {
-    if (e.key === 'Enter') submitGitHubToken();
-  });
   bg.querySelector('#settings-new-pw').focus();
-}
-
-function submitGitHubToken() {
-  const token = document.getElementById('settings-gh-token')?.value.trim() || '';
-  const errorEl = document.getElementById('settings-error');
-  if (!errorEl) return;
-  if (!token) {
-    errorEl.textContent = 'Bitte einen GitHub-Token eingeben.';
-    return;
-  }
-  saveGitHubToken(token);
-  errorEl.textContent = '';
-  toast('GitHub-Token fuer diese Sitzung gespeichert.','success');
-  if (pendingGitHubSync) void syncDatabaseToGitHub({ showSuccessToast: true });
-}
-
-function clearGitHubToken() {
-  saveGitHubToken('');
-  const tokenInput = document.getElementById('settings-gh-token');
-  const errorEl = document.getElementById('settings-error');
-  if (tokenInput) tokenInput.value = '';
-  if (errorEl) errorEl.textContent = '';
-  toast('GitHub-Token entfernt.','info');
 }
 
 async function submitPasswordChange() {
@@ -1352,10 +1258,10 @@ async function doDelete(version) {
   const sorted=[...entries].sort((a,b)=>cmpVer(b.version,a.version));
   currentVersion=sorted[0]?.version||'–';
   try {
-    await persist();
+    const saveResult = await persist();
     closeModal(); updateHeader(); renderEntries();
-    toast(`Version ${version} lokal geloescht.`,'info');
-    queueGitHubSync({ showMissingTokenToast: true });
+    if (saveResult.cloudOk) toast(`Version ${version} geloescht und mit Firestore synchronisiert.`,'info');
+    else toast(`Version ${version} lokal geloescht. Firestore-Sync folgt, sobald die Verbindung steht.`,'info');
   } catch (error) {
     entries = previousEntries;
     currentVersion = previousCurrentVersion;
@@ -1389,9 +1295,9 @@ function importData(e) {
       const ok=await confirmImport(d.entries.length);
       if(!ok)return;
       entries=d.entries; theme=d.theme||theme; currentVersion=d.currentVersion||currentVersion;
-      await persist(); updateHeader(); renderFilters(); renderEntries();
-      toast(`${d.entries.length} Versionen lokal importiert.`,'success');
-      queueGitHubSync({ showMissingTokenToast: true });
+      const saveResult = await persist(); updateHeader(); renderFilters(); renderEntries();
+      if (saveResult.cloudOk) toast(`${d.entries.length} Versionen importiert und mit Firestore synchronisiert.`,'success');
+      else toast(`${d.entries.length} Versionen lokal importiert. Firestore-Sync folgt, sobald die Verbindung steht.`,'info');
     } catch(err){
       entries = previousData.entries;
       theme = previousData.theme;
@@ -1452,6 +1358,7 @@ function doConfetti(){
   document.getElementById('pw-confirm').addEventListener('input', () => {
     if (pwMode === 'setup') document.getElementById('pw-error').textContent = '';
   });
+  await initFirestore();
   await loadSharedSeedData();
   theme = seedData.theme;
   currentVersion = seedData.currentVersion;
