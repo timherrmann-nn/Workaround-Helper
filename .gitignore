@@ -1,0 +1,8 @@
+# Local runtime config (contains sensitive keys)
+changelog2/config.local.js
+
+# Optional local secret files
+.env
+.env.*
+*.pem
+*.key

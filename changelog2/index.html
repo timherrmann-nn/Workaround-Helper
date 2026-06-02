@@ -441,6 +441,7 @@ mark.hl{background:rgba(216,111,74,.18);border-radius:6px;padding:0 3px;color:in
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./config.local.js"></script>
 
 <!-- ════════════════════════════════════════════════════════════
      JAVASCRIPT
@@ -511,14 +512,7 @@ const MASTER_WRAP_KEY = 'nn_cl_master_wrap';
 const MASTER_PASSWORD = 'NN-2026#';
 const LEGACY_MASTER_HASH = '8a716490c059482076fee5e4e7cd927eab5ff19db8adc41ac265856b65bd7aaf';
 const MIN_PASSWORD_LENGTH = 10;
-const FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyCFvASjxd151tIv22H39NqVrXqhkCAhOME',
-  authDomain: 'changelog-nn.firebaseapp.com',
-  projectId: 'changelog-nn',
-  storageBucket: 'changelog-nn.firebasestorage.app',
-  messagingSenderId: '419954074412',
-  appId: '1:419954074412:web:ad59b4ae83d32591a84289'
-};
+const FIREBASE_CONFIG = window.__APP_CONFIG?.firebase || null;
 const FIRESTORE_COLLECTION = 'changelog';
 const FIRESTORE_DOC_ID = 'main';
 
@@ -634,6 +628,11 @@ async function loadSharedSeedData() {
 async function initFirestore() {
   if (typeof firebase === 'undefined') {
     firestoreLastError = 'Firebase SDK nicht geladen.';
+    console.warn(firestoreLastError);
+    return;
+  }
+  if (!FIREBASE_CONFIG) {
+    firestoreLastError = 'Firebase Konfiguration fehlt. Bitte changelog2/config.local.js anlegen.';
     console.warn(firestoreLastError);
     return;
   }
