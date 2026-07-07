@@ -441,6 +441,7 @@ mark.hl{background:rgba(216,111,74,.18);border-radius:6px;padding:0 3px;color:in
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./config.js"></script>
 <script src="./config.local.js"></script>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -512,9 +513,22 @@ const MASTER_WRAP_KEY = 'nn_cl_master_wrap';
 const MASTER_PASSWORD = 'NN-2026#';
 const LEGACY_MASTER_HASH = '8a716490c059482076fee5e4e7cd927eab5ff19db8adc41ac265856b65bd7aaf';
 const MIN_PASSWORD_LENGTH = 10;
-const FIREBASE_CONFIG = window.__APP_CONFIG?.firebase || null;
+const FIREBASE_CONFIG = getFirebaseConfig();
 const FIRESTORE_COLLECTION = 'changelog';
 const FIRESTORE_DOC_ID = 'main';
+
+function getFirebaseConfig() {
+  const config = window.__APP_CONFIG?.firebase || null;
+  if (!config) return null;
+  const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'appId'];
+  const hasPlaceholder = Object.values(config).some(value =>
+    typeof value === 'string' && value.includes('REPLACE_WITH_')
+  );
+  const hasRequiredValues = requiredKeys.every(key =>
+    typeof config[key] === 'string' && config[key].trim()
+  );
+  return hasRequiredValues && !hasPlaceholder ? config : null;
+}
 
 /* SHA-256 eines Strings → Hex */
 async function sha256hex(str) {
@@ -632,7 +646,7 @@ async function initFirestore() {
     return;
   }
   if (!FIREBASE_CONFIG) {
-    firestoreLastError = 'Firebase Konfiguration fehlt. Bitte changelog2/config.local.js anlegen.';
+    firestoreLastError = 'Firebase Konfiguration fehlt. Bitte changelog2/config.js mit deiner Firebase Web-App-Konfiguration befuellen.';
     console.warn(firestoreLastError);
     return;
   }
