@@ -1002,17 +1002,61 @@ function todayISO(){ return new Date().toISOString().slice(0,10); }
 function fmtDate(iso){ if(!iso)return'–'; try{ const[y,m,d]=iso.split('-'); return `${d}.${m}.${y}`; } catch(e){ return iso; } }
 function hl(text,q){ if(!q)return text; return text.replace(new RegExp(`(${eR(q)})`,'gi'),'<mark class="hl">$1</mark>'); }
 function cmpVer(a,b){ const pa=a.split('.').map(n=>parseInt(n)||0),pb=b.split('.').map(n=>parseInt(n)||0); for(let i=0;i<Math.max(pa.length,pb.length);i++){const d=(pa[i]||0)-(pb[i]||0);if(d!==0)return d;}return 0; }
+function sortEntriesForDisplay(list){
+  return [...list].sort((a,b)=>{
+    const versionDiff = cmpVer(b.version, a.version);
+    return versionDiff !== 0 ? versionDiff : String(b.date || '').localeCompare(String(a.date || ''));
+  });
+}
+function comparableData(data){
+  const normalized = normalizeData(data);
+  return {
+    theme: normalized.theme,
+    currentVersion: normalized.currentVersion,
+    entries: sortEntriesForDisplay(normalized.entries)
+  };
+}
+function dataChanged(a,b){
+  return JSON.stringify(comparableData(a)) !== JSON.stringify(comparableData(b));
+}
+function mergeChangelogData(cloudData, localData){
+  const byVersion = new Map();
+  sortEntriesForDisplay(cloudData.entries || []).forEach(entry => byVersion.set(entry.version, cloneData({theme:'',currentVersion:'',entries:[entry]}).entries[0]));
+  sortEntriesForDisplay(localData.entries || []).forEach(entry => byVersion.set(entry.version, cloneData({theme:'',currentVersion:'',entries:[entry]}).entries[0]));
+  const mergedEntries = sortEntriesForDisplay([...byVersion.values()]);
+  return normalizeData({
+    theme: localData.theme || cloudData.theme,
+    currentVersion: mergedEntries[0]?.version || localData.currentVersion || cloudData.currentVersion,
+    entries: mergedEntries
+  });
+}
 
 /* ────────────────────────────────────────────────────────────────
    APP BOOTEN (nach erfolgreichem Login)
    ──────────────────────────────────────────────────────────────── */
 function bootApp() {
   if (seedSource === 'firestore') {
-    entries = cloneInitialEntries();
-    theme = seedData.theme;
-    currentVersion = seedData.currentVersion;
+    const cloudData = cloneData(seedData);
+    const localData = normalizeData({ theme, currentVersion, entries });
+    const localVersionDiff = cmpVer(localData.currentVersion, cloudData.currentVersion);
+    const useLocalData = hasStoredData() && localVersionDiff >= 0;
+    const nextData = useLocalData ? mergeChangelogData(cloudData, localData) : cloudData;
+    entries = nextData.entries;
+    theme = nextData.theme;
+    currentVersion = nextData.currentVersion;
     if (activePassword) {
       void persistWithPassword(activePassword);
+    }
+    if (useLocalData && dataChanged(nextData, cloudData)) {
+      void persistToFirestore()
+        .then(() => {
+          seedData = cloneData(nextData);
+          toast('Lokale Änderungen wurden mit Firestore synchronisiert.','success');
+        })
+        .catch(error => {
+          console.error('Firestore startup sync failed:', error);
+          toast(`Lokale Änderungen bleiben gespeichert. Firestore-Fehler: ${error?.message || String(error)}`,'error');
+        });
     }
   }
   updateHeader();
